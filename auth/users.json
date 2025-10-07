@@ -1,0 +1,20 @@
+{
+  "640508615": {
+    "id": 640508615,
+    "firstName": "Елизавета",
+    "lastName": "Майер",
+    "username": "EvettaMayer",
+    "registeredAt": "2025-10-07T06:12:27.622Z",
+    "lastLogin": "2025-10-07T06:12:27.630Z",
+    "progress": {
+      "level": 1,
+      "completedPuzzles": [],
+      "timePatience": 100,
+      "currentLocation": "start_village"
+    },
+    "inventory": {
+      "codeFragments": 3,
+      "timeShards": 0
+    }
+  }
+}

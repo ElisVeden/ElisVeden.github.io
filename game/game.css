@@ -1,0 +1,489 @@
+ :root {
+    --dark-blue: #0a0e2a;
+    --deep-purple: #1a1a3a;
+    --purple: #4a1e6a;
+    --light-purple: #6b46c1;
+    --yellow: #fbbf24;
+    --light-yellow: #fde68a;
+    --gray-dark: #1f2937;
+    --gray-light: #6b7280;
+    --white: #f8fafc;
+    --success: #10b981;
+    --error: #ef4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Raleway', sans-serif;
+    background: var(--dark-blue);
+    color: var(--white);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Анимированный фон */
+.game-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(107, 70, 193, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(74, 30, 106, 0.2) 0%, transparent 50%);
+    z-index: -2;
+}
+
+.time-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(2px 2px at 20px 30px, var(--light-yellow), transparent),
+        radial-gradient(2px 2px at 40px 70px, var(--light-purple), transparent),
+        radial-gradient(1px 1px at 90px 40px, var(--white), transparent);
+    background-size: 200px 200px;
+    animation: particleFloat 20s infinite linear;
+    z-index: -1;
+    opacity: 0.3;
+}
+
+@keyframes particleFloat {
+    0% { transform: translateY(0px) translateX(0px); }
+    100% { transform: translateY(-200px) translateX(100px); }
+}
+
+/* Верхняя панель */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: rgba(26, 26, 58, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--light-purple);
+}
+
+.location-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.location-icon {
+    font-size: 2rem;
+    animation: pulse 2s infinite;
+}
+
+.location-name {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--light-yellow);
+    font-size: 1.2rem;
+}
+
+.resources {
+    display: flex;
+    gap: 2rem;
+}
+
+.resource {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(107, 70, 193, 0.2);
+    border-radius: 25px;
+    border: 1px solid var(--light-purple);
+}
+
+.resource-icon {
+    font-size: 1.2rem;
+}
+
+.resource-value {
+    font-weight: bold;
+    color: var(--light-yellow);
+}
+
+/* Основной контейнер */
+.game-container {
+    display: grid;
+    grid-template-rows: 1fr auto auto;
+    height: calc(100vh - 80px);
+    gap: 1rem;
+    padding: 1rem;
+}
+
+/* Визуальная область */
+.visual-area {
+    position: relative;
+    background: rgba(15, 15, 35, 0.6);
+    border-radius: 15px;
+    border: 1px solid var(--light-purple);
+    overflow: hidden;
+}
+
+.scene-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scene-background {
+    font-size: 8rem;
+    opacity: 0.3;
+    position: absolute;
+    z-index: 1;
+}
+
+.character {
+    font-size: 6rem;
+    z-index: 2;
+    position: relative;
+}
+
+.animated-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.environment-object {
+    position: absolute;
+    font-size: 3rem;
+    opacity: 0.7;
+}
+
+.object-1 { top: 20%; left: 10%; animation: float 4s ease-in-out infinite 0.5s; }
+.object-2 { top: 10%; right: 15%; animation: float 5s ease-in-out infinite 1s; }
+.object-3 { bottom: 20%; left: 20%; animation: float 3.5s ease-in-out infinite 1.5s; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Диалоговая область */
+.dialogue-area {
+    background: rgba(26, 26, 58, 0.9);
+    border-radius: 15px;
+    border: 1px solid var(--light-purple);
+    padding: 1.5rem;
+}
+
+.dialogue-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.speaker {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.speaker-icon {
+    font-size: 2rem;
+}
+
+.speaker-name {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--yellow);
+    font-size: 1.1rem;
+}
+
+.dialogue-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--white);
+}
+
+/* Область игрока */
+.player-area {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+}
+
+.player-actions {
+    background: rgba(26, 26, 58, 0.8);
+    border-radius: 15px;
+    border: 1px solid var(--light-purple);
+    padding: 1.5rem;
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(45deg, var(--light-purple), var(--purple));
+    border: none;
+    border-radius: 10px;
+    color: var(--white);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(107, 70, 193, 0.4);
+}
+
+.btn-icon {
+    font-size: 1.2rem;
+}
+
+/* Секция с головоломкой */
+.puzzle-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(15, 15, 35, 0.6);
+    border-radius: 10px;
+    border-left: 4px solid var(--yellow);
+}
+
+.puzzle-header h3 {
+    color: var(--light-yellow);
+    margin-bottom: 0.5rem;
+}
+
+.puzzle-header p {
+    color: var(--gray-light);
+    margin-bottom: 1rem;
+}
+
+.code-block {
+    background: var(--dark-blue);
+    border: 1px solid var(--light-purple);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    font-family: 'Courier New', monospace;
+    color: var(--light-yellow);
+}
+
+.code-answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+}
+
+.code-answer {
+    padding: 1rem;
+    background: rgba(107, 70, 193, 0.2);
+    border: 1px solid var(--light-purple);
+    border-radius: 8px;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Courier New', monospace;
+    text-align: left;
+}
+
+.code-answer:hover {
+    background: rgba(107, 70, 193, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Панель инструментов */
+.tools-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.tool-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(26, 26, 58, 0.8);
+    border: 1px solid var(--light-purple);
+    border-radius: 10px;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 80px;
+}
+
+.tool-btn:hover {
+    background: rgba(107, 70, 193, 0.3);
+    transform: translateY(-2px);
+}
+
+.tool-icon {
+    font-size: 1.5rem;
+}
+
+.tool-label {
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* Модальные окна */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 14, 42, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, var(--deep-purple) 0%, var(--purple) 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    border: 1px solid var(--light-purple);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    color: var(--gray-light);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: var(--yellow);
+}
+
+.modal-content h2 {
+    color: var(--light-yellow);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.inventory-items, .map-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.inventory-item, .map-location {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.item-icon, .map-icon {
+    font-size: 1.5rem;
+}
+
+.item-name, .map-location span {
+    flex: 1;
+}
+
+.item-count {
+    color: var(--yellow);
+    font-weight: bold;
+}
+
+.map-location.current {
+    border-left: 4px solid var(--yellow);
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.map-location.locked {
+    opacity: 0.5;
+    color: var(--gray-light);
+}
+
+/* Утилиты */
+.hidden {
+    display: none !important;
+}
+
+.success {
+    color: var(--success);
+}
+
+.error {
+    color: var(--error);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .game-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .resources {
+        gap: 1rem;
+    }
+    
+    .player-area {
+        grid-template-columns: 1fr;
+    }
+    
+    .tools-panel {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+    
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .code-answers {
+        grid-template-columns: 1fr;
+    }
+    
+    .scene-background {
+        font-size: 4rem;
+    }
+    
+    .character {
+        font-size: 4rem;
+    }
+    
+    .environment-object {
+        font-size: 2rem;
+    }
+}

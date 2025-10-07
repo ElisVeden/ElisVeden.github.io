@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рунный Следопыт - Игра</title>
+    <link rel="stylesheet" href="game.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Raleway:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="game-background"></div>
+    <div class="time-particles"></div>
+
+    <!-- Верхняя панель -->
+    <header class="game-header">
+        <div class="location-info">
+            <span class="location-icon">🏰</span>
+            <h1 class="location-name">Деревня Бесконечного Утра</h1>
+        </div>
+        <div class="resources">
+            <div class="resource">
+                <span class="resource-icon">⏳</span>
+                <span class="resource-value" id="timePatience">100</span>
+            </div>
+            <div class="resource">
+                <span class="resource-icon">💎</span>
+                <span class="resource-value" id="codeFragments">3</span>
+            </div>
+            <div class="resource">
+                <span class="resource-icon">🔮</span>
+                <span class="resource-value" id="timeShards">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Основной игровой экран -->
+    <main class="game-container">
+        <!-- Область визуализации -->
+        <section class="visual-area">
+            <div class="scene-container">
+                <div class="scene-background">🌅</div>
+                <div class="character animated-float">🧙‍♂️</div>
+                <div class="environment-object object-1">⛰️</div>
+                <div class="environment-object object-2">🌳</div>
+                <div class="environment-object object-3">🏘️</div>
+            </div>
+        </section>
+
+        <!-- Диалоговое окно -->
+        <section class="dialogue-area">
+            <div class="dialogue-container">
+                <div class="speaker">
+                    <span class="speaker-icon">🧙‍♂️</span>
+                    <span class="speaker-name">Дебаггер</span>
+                </div>
+                <div class="dialogue-text" id="dialogueText">
+                    Время в этой деревне застыло! Жители повторяют одни и те же действия.
+                    Посмотри на кузнеца - он замер в середине работы.
+                    Нужно исправить Рунный Код чтобы продолжить движение времени.
+                </div>
+            </div>
+        </section>
+
+        <!-- Область игрока -->
+        <section class="player-area">
+            <div class="player-actions">
+                <div class="action-buttons" id="actionButtons">
+                    <button class="action-btn" onclick="showPuzzle()">
+                        <span class="btn-icon">🔍</span>
+                        Исследовать код
+                    </button>
+                    <button class="action-btn" onclick="talkToCharacter()">
+                        <span class="btn-icon">💬</span>
+                        Поговорить с кузнецом
+                    </button>
+                    <button class="action-btn" onclick="useCodeFragment()">
+                        <span class="btn-icon">💎</span>
+                        Использовать фрагмент кода
+                    </button>
+                </div>
+
+                <div class="puzzle-section hidden" id="puzzleSection">
+                    <div class="puzzle-header">
+                        <h3>🛠️ Исправь Рунный Код</h3>
+                        <p>Кузнец не может ударить по наковальне потому что переменная установлена неверно</p>
+                    </div>
+                    <div class="code-block">
+                        <pre>var anvilIsHot = false;
+                                var blacksmithAction;
+
+                                if (________) {
+                                    blacksmithAction = "strike_anvil";
+                                    advanceTime();
+                                } else {
+                                    blacksmithAction = "wait";
+                                }</pre>
+                    </div>
+                    <div class="code-answers">
+                        <button class="code-answer" onclick="checkAnswer('anvilIsHot == true')">anvilIsHot ==
+                            true</button>
+                        <button class="code-answer" onclick="checkAnswer('!anvilIsHot')">!anvilIsHot</button>
+                        <button class="code-answer" onclick="checkAnswer('anvilIsHot == false')">anvilIsHot == false</button>
+                        <button class="code-answer" onclick="checkAnswer('blacksmithAction == strike_anvil')">blacksmithAction == "strike_anvil"</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Боковая панель инструментов -->
+            <div class="tools-panel">
+                <button class="tool-btn" onclick="toggleInventory()">
+                    <span class="tool-icon">🎒</span>
+                    <span class="tool-label">Инвентарь</span>
+                </button>
+                <button class="tool-btn" onclick="showHint()">
+                    <span class="tool-icon">💡</span>
+                    <span class="tool-label">Подсказка</span>
+                </button>
+                <button class="tool-btn" onclick="showMap()">
+                    <span class="tool-icon">🗺️</span>
+                    <span class="tool-label">Карта</span>
+                </button>
+                <button class="tool-btn" onclick="showMenu()">
+                    <span class="tool-icon">⚙️</span>
+                    <span class="tool-label">Меню</span>
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Модальные окна -->
+    <div id="inventoryModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModals()">&times;</span>
+            <h2>🎒 Инвентарь</h2>
+            <div class="inventory-items">
+                <div class="inventory-item">
+                    <span class="item-icon">💎</span>
+                    <span class="item-name">Фрагменты кода</span>
+                    <span class="item-count" id="inventoryFragments">3</span>
+                </div>
+                <div class="inventory-item">
+                    <span class="item-icon">🔮</span>
+                    <span class="item-name">Осколки времени</span>
+                    <span class="item-count" id="inventoryShards">0</span>
+                </div>
+                <div class="inventory-item">
+                    <span class="item-icon">📜</span>
+                    <span class="item-name">Древние свитки</span>
+                    <span class="item-count">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mapModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModals()">&times;</span>
+            <h2>🗺️ Карта мира</h2>
+            <div class="map-container">
+                <div class="map-location current">
+                    <span class="map-icon">🏰</span>
+                    <span>Деревня Бесконечного Утра</span>
+                </div>
+                <div class="map-location locked">
+                    <span class="map-icon">⛰️</span>
+                    <span>Рудники Повторения</span>
+                </div>
+                <div class="map-location locked">
+                    <span class="map-icon">🏛️</span>
+                    <span>Замок Функций</span>
+                </div>
+                <div class="map-location locked">
+                    <span class="map-icon">🌌</span>
+                    <span>Ядро Времени</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+
+</html>
