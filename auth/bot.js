@@ -35,7 +35,7 @@ async function createFirebaseUser(telegramUser) {
         
         // Создаем уникальный email на основе Telegram ID
         const email = `telegram_${telegramUser.id}@telegram.com`;
-        const password = generateRandomPassword();
+        const password = generateDeterministicPassword(telegramUser.id);
         
         console.log('Creating Firebase user with email:', email);
         
@@ -52,6 +52,7 @@ async function createFirebaseUser(telegramUser) {
             lastName: telegramUser.last_name || '',
             username: telegramUser.username || '',
             firebaseUid: firebaseUser.uid,
+            email: email,
             createdAt: firebase.database.ServerValue.TIMESTAMP
         });
         
@@ -59,13 +60,6 @@ async function createFirebaseUser(telegramUser) {
         return firebaseUser;
     } catch (error) {
         console.error('Error creating Firebase user:', error);
-        
-        // Если пользователь уже существует, пытаемся войти
-        if (error.code === 'auth/email-already-in-use') {
-            console.log('User already exists, trying to sign in...');
-            return await signInFirebaseUser(telegramUser.id);
-        }
-        
         throw error;
     }
 }
@@ -93,8 +87,7 @@ async function signInFirebaseUser(telegramId) {
         }
         
         const email = `telegram_${telegramId}@telegram.com`;
-        // Используем тот же алгоритм генерации пароля
-        const password = generateRandomPasswordForUser(telegramId);
+        const password = generateDeterministicPassword(telegramId);
         
         console.log('Signing in with email:', email);
         
@@ -103,15 +96,41 @@ async function signInFirebaseUser(telegramId) {
         return userCredential.user;
     } catch (error) {
         console.error('Error signing in:', error);
-        
-        // Если пароль не подходит, создаем нового пользователя
-        if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-            console.log('Authentication failed, creating new user...');
-            // Для простоты демонстрации создаем нового пользователя
-            // В реальном приложении нужно хранить пароли безопасно
-            throw new Error('Please try logging in again to create a new account');
+        throw error;
+    }
+}
+
+// Функция для обработки пользователя (основная логика)
+async function processUserAuthentication(telegramUser) {
+    try {
+        // Сначала пытаемся найти пользователя в базе данных
+        let userData = await findUserByTelegramId(telegramUser.id);
+        let firebaseUser;
+
+        if (!userData) {
+            console.log('User not found in database, creating new user...');
+            // Пользователя нет в базе - создаем нового
+            firebaseUser = await createFirebaseUser(telegramUser);
+            userData = await findUserByTelegramId(telegramUser.id);
+        } else {
+            console.log('User found in database, signing in...');
+            // Пользователь есть в базе - пытаемся войти
+            try {
+                firebaseUser = await signInFirebaseUser(telegramUser.id);
+            } catch (signInError) {
+                if (signInError.code === 'auth/user-not-found' || signInError.code === 'auth/wrong-password') {
+                    console.log('Sign in failed, user might be deleted from Auth but exists in DB. Recreating...');
+                    // Пользователь есть в DB но нет в Auth - пересоздаем
+                    firebaseUser = await createFirebaseUser(telegramUser);
+                } else {
+                    throw signInError;
+                }
+            }
         }
-        
+
+        return { firebaseUser, userData };
+    } catch (error) {
+        console.error('Error in user authentication process:', error);
         throw error;
     }
 }
@@ -123,18 +142,22 @@ async function deleteUserAccount(telegramId) {
             throw new Error('Firebase not available');
         }
         
-        // Находим пользователя в базе данных
-        const userData = await findUserByTelegramId(telegramId);
-        
-        if (!userData) {
-            throw new Error('User not found in database');
-        }
-        
         console.log('Deleting user account for Telegram ID:', telegramId);
         
         // Удаляем из базы данных
         await firebase.database().ref('users/' + telegramId).remove();
         console.log('User data deleted from database');
+        
+        // Также пытаемся удалить из Auth (если можем войти)
+        try {
+            const email = `telegram_${telegramId}@telegram.com`;
+            const password = generateDeterministicPassword(telegramId);
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+            await userCredential.user.delete();
+            console.log('User deleted from Firebase Auth');
+        } catch (authError) {
+            console.log('Could not delete from Auth (might not exist):', authError.message);
+        }
         
         return true;
     } catch (error) {
@@ -143,14 +166,10 @@ async function deleteUserAccount(telegramId) {
     }
 }
 
-// Генерация случайного пароля
-function generateRandomPassword() {
-    return `telegram_${Date.now()}_password`;
-}
-
-// Генерация детерминированного пароля для пользователя
-function generateRandomPasswordForUser(telegramId) {
-    return `telegram_${telegramId}_password`;
+// Детерминированная генерация пароля (всегда одинаковый для одного Telegram ID)
+function generateDeterministicPassword(telegramId) {
+    // Простой детерминированный пароль на основе ID
+    return `tg${telegramId}pass${telegramId % 10000}`;
 }
 
 // Обработка данных от Telegram
@@ -158,20 +177,7 @@ window.handleTelegramAuth = async function(user) {
     try {
         console.log('Processing Telegram auth for user:', user);
         
-        // Проверяем, существует ли пользователь
-        let userData = await findUserByTelegramId(user.id);
-        let firebaseUser;
-        
-        if (!userData) {
-            console.log('Creating new user...');
-            // Создаем нового пользователя
-            firebaseUser = await createFirebaseUser(user);
-            userData = await findUserByTelegramId(user.id);
-        } else {
-            console.log('User exists, signing in...');
-            // Входим под существующим пользователем
-            firebaseUser = await signInFirebaseUser(user.id);
-        }
+        const { firebaseUser, userData } = await processUserAuthentication(user);
         
         // Сохраняем данные пользователя в localStorage
         localStorage.setItem('telegramUser', JSON.stringify(user));
@@ -189,6 +195,13 @@ window.handleTelegramAuth = async function(user) {
         document.getElementById('loading').style.display = 'none';
         document.getElementById('success').style.display = 'block';
         
+        // Обновляем статус
+        document.getElementById('auth-steps').innerHTML = `
+            <p>✓ Данные из Telegram получены</p>
+            <p>✓ Пользователь проверен в Firebase</p>
+            <p>✓ Перенаправление в игру...</p>
+        `;
+        
         // Перенаправляем на игровую страницу
         setTimeout(function() {
             window.location.href = '/game/game.html';
@@ -198,17 +211,48 @@ window.handleTelegramAuth = async function(user) {
         console.error('Authentication error:', error);
         document.getElementById('loading').style.display = 'none';
         document.getElementById('error').style.display = 'block';
-        document.getElementById('error-message').textContent = 'Ошибка авторизации: ' + error.message;
+        
+        let errorMessage = 'Ошибка авторизации: ' + error.message;
+        
+        // Более понятные сообщения об ошибках
+        if (error.code === 'auth/email-already-in-use') {
+            errorMessage = 'Аккаунт уже существует. Пожалуйста, используйте кнопку "Удалить аккаунт" и попробуйте снова.';
+        } else if (error.code === 'auth/user-not-found') {
+            errorMessage = 'Пользователь не найден. Попробуйте авторизоваться снова.';
+        } else if (error.code === 'auth/wrong-password') {
+            errorMessage = 'Ошибка входа. Попробуйте удалить аккаунт и создать заново.';
+        }
+        
+        document.getElementById('error-message').textContent = errorMessage;
     }
 };
 
 // Функция для удаления аккаунта (для отладки)
 window.deleteCurrentUser = async function() {
     try {
-        const telegramUser = JSON.parse(localStorage.getItem('telegramUser'));
+        // Получаем Telegram user из URL параметров если есть
+        let telegramUser;
+        try {
+            const searchParams = new URLSearchParams(window.location.search);
+            if (searchParams.get('id')) {
+                telegramUser = {
+                    id: parseInt(searchParams.get('id')),
+                    first_name: decodeURIComponent(searchParams.get('first_name') || ''),
+                    last_name: decodeURIComponent(searchParams.get('last_name') || ''),
+                    username: searchParams.get('username') || ''
+                };
+            }
+        } catch (e) {
+            console.log('Could not get user from URL');
+        }
+        
+        // Если нет в URL, пробуем из localStorage
+        if (!telegramUser) {
+            telegramUser = JSON.parse(localStorage.getItem('telegramUser'));
+        }
         
         if (!telegramUser || !telegramUser.id) {
-            alert('Пользователь не найден в localStorage');
+            alert('Пользователь не найден. Сначала авторизуйтесь через Telegram.');
             return;
         }
         
