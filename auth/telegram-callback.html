@@ -66,30 +66,30 @@
         // Функция для получения параметров из URL Telegram
         function getTelegramAuthData() {
             console.log('Current URL:', window.location.href);
-            console.log('URL hash:', window.location.hash);
+            console.log('URL search:', window.location.search);
             
-            // Telegram передает данные в hash части URL
-            const hash = window.location.hash.substr(1);
-            if (!hash) {
+            // Telegram передает данные в query string (после ?), а не в hash
+            const searchParams = new URLSearchParams(window.location.search);
+            
+            if (searchParams.toString() === '') {
                 throw new Error('No authentication data found in URL');
             }
             
-            const params = new URLSearchParams(hash);
             const user = {};
             
             // Проверяем обязательные поля
-            if (!params.get('id')) {
+            if (!searchParams.get('id')) {
                 throw new Error('User ID not found in authentication data');
             }
             
             // Собираем данные пользователя
-            user.id = parseInt(params.get('id'));
-            user.first_name = params.get('first_name') || '';
-            user.last_name = params.get('last_name') || '';
-            user.username = params.get('username') || '';
-            user.photo_url = params.get('photo_url') || '';
-            user.auth_date = parseInt(params.get('auth_date')) || 0;
-            user.hash = params.get('hash') || '';
+            user.id = parseInt(searchParams.get('id'));
+            user.first_name = decodeURIComponent(searchParams.get('first_name') || '');
+            user.last_name = decodeURIComponent(searchParams.get('last_name') || '');
+            user.username = searchParams.get('username') || '';
+            user.photo_url = decodeURIComponent(searchParams.get('photo_url') || '');
+            user.auth_date = parseInt(searchParams.get('auth_date')) || 0;
+            user.hash = searchParams.get('hash') || '';
             
             console.log('Parsed user data:', user);
             return user;
