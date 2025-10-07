@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Авторизация</title>
+</head>
+<body>
+    <script>
+        // Получаем данные из URL
+        const urlParams = new URLSearchParams(window.location.hash.substring(1));
+        const userData = {};
+        
+        for (const [key, value] of urlParams) {
+            userData[key] = value;
+        }
+
+        // Передаем данные в основное окно
+        if (window.opener) {
+            window.opener.handleTelegramAuth(userData);
+            window.close();
+        } else {
+            // Если открыто в той же вкладке
+            localStorage.setItem('telegramAuthData', JSON.stringify(userData));
+            window.location.href = '/'; // Возврат на главную
+        }
+        
+    </script>
+</body>
+</html>
