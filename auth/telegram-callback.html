@@ -1,99 +1,89 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Авторизация завершена | Рунный Следопыт</title>
+    <title>Telegram Auth</title>
+    <script src="bot.js"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-        }
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .success-icon {
-            font-size: 3rem;
-            color: #0088cc;
-            margin-bottom: 1rem;
-        }
         .loading {
-            display: none;
+            text-align: center;
+            padding: 50px;
+            font-family: Arial, sans-serif;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            padding: 20px;
+        }
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="success-icon">✓</div>
-        <h1>Авторизация завершена!</h1>
-        <p>Возвращаемся в игру...</p>
-        <div class="loading" id="loading">
-            <p>Если перенаправление не произошло автоматически, <a href="/" id="manualLink">нажмите сюда</a></p>
-        </div>
+    <div id="loading" class="loading">
+        <h2>Авторизация...</h2>
+        <p>Пожалуйста, подождите</p>
+    </div>
+    
+    <div id="error" class="error" style="display: none;">
+        <h2>Ошибка авторизации</h2>
+        <p id="error-message"></p>
+        <button onclick="window.location.href='/'">Вернуться на главную</button>
     </div>
 
     <script>
-        function processTelegramAuth() {
+        // Функция для получения параметров из URL
+        function getUrlParams() {
+            const params = {};
+            const queryString = window.location.hash.substring(1);
+            const regex = /([^&=]+)=([^&]*)/g;
+            let m;
+            
+            while (m = regex.exec(queryString)) {
+                params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+            }
+            
+            return params;
+        }
+
+        // Обработка данных авторизации
+        async function processAuth() {
             try {
-                // Получаем данные из URL параметров
-                const urlParams = new URLSearchParams(window.location.search);
-                const userData = {};
+                const params = getUrlParams();
                 
-                // Собираем все параметры
-                for (const [key, value] of urlParams) {
-                    userData[key] = value;
-                }
-
-                console.log('Получены данные авторизации:', userData);
-
-                if (Object.keys(userData).length > 0) {
-                    // Сохраняем в localStorage
-                    localStorage.setItem('telegramUserData', JSON.stringify(userData));
-                    localStorage.setItem('isAuthenticated', 'true');
+                if (params.id) {
+                    const user = {
+                        id: parseInt(params.id),
+                        first_name: params.first_name || '',
+                        last_name: params.last_name || '',
+                        username: params.username || '',
+                        photo_url: params.photo_url || '',
+                        auth_date: parseInt(params.auth_date),
+                        hash: params.hash
+                    };
                     
-                    // Передаем данные в opener если есть
-                    if (window.opener && !window.opener.closed) {
-                        try {
-                            if (window.opener.handleTelegramAuth) {
-                                window.opener.handleTelegramAuth(userData);
-                            }
-                            window.close();
-                            return;
-                        } catch (e) {
-                            console.log('Не удалось передать данные в opener:', e);
-                        }
-                    }
-                    
-                    // Если нет opener, перенаправляем на главную
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
-                    
+                    await handleTelegramAuth(user);
                 } else {
-                    document.getElementById('loading').style.display = 'block';
-                    document.getElementById('manualLink').href = '/';
+                    throw new Error('Не удалось получить данные пользователя');
                 }
-                
             } catch (error) {
-                console.error('Ошибка обработки авторизации:', error);
-                document.getElementById('loading').style.display = 'block';
-                document.getElementById('manualLink').href = '/';
+                console.error('Auth processing error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error-message').textContent = error.message;
             }
         }
 
-        // Запускаем обработку при загрузке
-        document.addEventListener('DOMContentLoaded', processTelegramAuth);
+        // Запускаем обработку при загрузке страницы
+        document.addEventListener('DOMContentLoaded', processAuth);
     </script>
 </body>
 </html>

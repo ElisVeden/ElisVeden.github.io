@@ -1,4 +1,64 @@
 // game.js
+// Проверка авторизации
+if (typeof checkAuth === 'function' && !checkAuth()) {
+    window.location.href = '/';
+    throw new Error('User not authenticated');
+}
+
+// Получение данных пользователя
+let currentUser = null;
+if (typeof getCurrentUser === 'function') {
+    currentUser = getCurrentUser();
+    
+    if (currentUser && currentUser.telegram) {
+        console.log('Authenticated user:', currentUser.telegram.username);
+        // Здесь можно отобразить информацию о пользователе в интерфейсе
+    }
+}
+
+// Функция для выхода
+function logout() {
+    localStorage.removeItem('telegramUser');
+    localStorage.removeItem('firebaseUser');
+    window.location.href = '/';
+}
+
+// Функция для удаления аккаунта
+function deleteAccount() {
+    if (typeof deleteCurrentUser === 'function') {
+        deleteCurrentUser();
+    } else {
+        alert('Функция удаления недоступна');
+    }
+}
+
+// Добавьте кнопки управления аккаунтом в ваш интерфейс
+function addAccountControls() {
+    // Найдем подходящее место в вашем интерфейсе для добавления кнопок
+    const controlsContainer = document.createElement('div');
+    controlsContainer.style.position = 'fixed';
+    controlsContainer.style.top = '10px';
+    controlsContainer.style.right = '10px';
+    controlsContainer.style.zIndex = '1000';
+    
+    controlsContainer.innerHTML = `
+        <div style="background: rgba(0,0,0,0.8); padding: 10px; border-radius: 5px; color: white;">
+            <div>User: ${currentUser?.telegram?.first_name || 'Unknown'}</div>
+            <button onclick="logout()" style="margin: 5px; padding: 5px 10px;">Logout</button>
+            <button onclick="deleteAccount()" style="margin: 5px; padding: 5px 10px; background: #ff4444; color: white; border: none;">Delete Account</button>
+        </div>
+    `;
+    
+    document.body.appendChild(controlsContainer);
+}
+
+// Добавляем элементы управления после загрузки DOM
+document.addEventListener('DOMContentLoaded', function() {
+    if (currentUser) {
+        addAccountControls();
+    }
+});
+
 class Game {
     constructor() {
         this.timePatience = 100;

@@ -1,4 +1,10 @@
 // script.js
+// Проверяем, авторизован ли пользователь
+if (typeof checkAuth === 'function' && checkAuth()) {
+    // Если пользователь уже авторизован, перенаправляем в игру
+    window.location.href = '/game/game.html';
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const loginBtn = document.getElementById('loginBtn');
     const authModal = document.getElementById('authModal');
