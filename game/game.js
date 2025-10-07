@@ -1,18 +1,29 @@
 // game.js
-// Проверка авторизации
-if (typeof checkAuth === 'function' && !checkAuth()) {
-    window.location.href = '/';
-    throw new Error('User not authenticated');
+// Проверка авторизации при загрузке игры
+function checkAuthentication() {
+    const telegramUser = localStorage.getItem('telegramUser');
+    const firebaseUser = localStorage.getItem('firebaseUser');
+    
+    if (!telegramUser || !firebaseUser) {
+        window.location.href = '/';
+        return false;
+    }
+    
+    return true;
 }
 
 // Получение данных пользователя
-let currentUser = null;
-if (typeof getCurrentUser === 'function') {
-    currentUser = getCurrentUser();
-    
-    if (currentUser && currentUser.telegram) {
-        console.log('Authenticated user:', currentUser.telegram.username);
-        // Здесь можно отобразить информацию о пользователе в интерфейсе
+function getCurrentUser() {
+    try {
+        const telegramUser = JSON.parse(localStorage.getItem('telegramUser'));
+        const firebaseUser = JSON.parse(localStorage.getItem('firebaseUser'));
+        
+        return {
+            telegram: telegramUser,
+            firebase: firebaseUser
+        };
+    } catch (error) {
+        return null;
     }
 }
 
@@ -25,32 +36,58 @@ function logout() {
 
 // Функция для удаления аккаунта
 function deleteAccount() {
-    if (typeof deleteCurrentUser === 'function') {
-        deleteCurrentUser();
-    } else {
-        alert('Функция удаления недоступна');
+    if (confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.')) {
+        // Очищаем localStorage
+        localStorage.removeItem('telegramUser');
+        localStorage.removeItem('firebaseUser');
+        alert('Аккаунт удален (в демо-версии только из localStorage)');
+        window.location.href = '/';
     }
 }
 
-// Добавьте кнопки управления аккаунтом в ваш интерфейс
+// Добавление элементов управления аккаунтом
 function addAccountControls() {
-    // Найдем подходящее место в вашем интерфейсе для добавления кнопок
+    const user = getCurrentUser();
+    if (!user) return;
+    
     const controlsContainer = document.createElement('div');
     controlsContainer.style.position = 'fixed';
     controlsContainer.style.top = '10px';
     controlsContainer.style.right = '10px';
     controlsContainer.style.zIndex = '1000';
+    controlsContainer.style.fontFamily = 'Arial, sans-serif';
     
     controlsContainer.innerHTML = `
-        <div style="background: rgba(0,0,0,0.8); padding: 10px; border-radius: 5px; color: white;">
-            <div>User: ${currentUser?.telegram?.first_name || 'Unknown'}</div>
-            <button onclick="logout()" style="margin: 5px; padding: 5px 10px;">Logout</button>
-            <button onclick="deleteAccount()" style="margin: 5px; padding: 5px 10px; background: #ff4444; color: white; border: none;">Delete Account</button>
+        <div style="background: rgba(0,0,0,0.8); padding: 10px; border-radius: 5px; color: white; font-size: 14px;">
+            <div style="margin-bottom: 8px;">
+                <strong>${user.telegram.first_name || 'User'}</strong>
+                ${user.telegram.username ? `(@${user.telegram.username})` : ''}
+            </div>
+            <button onclick="logout()" style="margin: 2px; padding: 5px 10px; background: #666; color: white; border: none; border-radius: 3px; cursor: pointer;">Logout</button>
+            <button onclick="deleteAccount()" style="margin: 2px; padding: 5px 10px; background: #ff4444; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete Account</button>
         </div>
     `;
     
     document.body.appendChild(controlsContainer);
 }
+
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем авторизацию
+    if (!checkAuthentication()) {
+        return;
+    }
+    
+    // Добавляем элементы управления
+    addAccountControls();
+    
+    // Ваш существующий код игры здесь...
+    console.log('Game initialized for user:', getCurrentUser().telegram.first_name);
+});
+
+// Делаем функции глобальными для использования в HTML
+window.logout = logout;
+window.deleteAccount = deleteAccount;
 
 // Добавляем элементы управления после загрузки DOM
 document.addEventListener('DOMContentLoaded', function() {
