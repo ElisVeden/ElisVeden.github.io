@@ -1,14 +1,15 @@
-// game.js
 // Проверка авторизации при загрузке игры
 function checkAuthentication() {
     const telegramUser = localStorage.getItem('telegramUser');
     const firebaseUser = localStorage.getItem('firebaseUser');
     
     if (!telegramUser || !firebaseUser) {
+        console.log('User not authenticated, redirecting to home...');
         window.location.href = '/';
         return false;
     }
     
+    console.log('User authenticated:', JSON.parse(telegramUser).first_name);
     return true;
 }
 
@@ -17,12 +18,15 @@ function getCurrentUser() {
     try {
         const telegramUser = JSON.parse(localStorage.getItem('telegramUser'));
         const firebaseUser = JSON.parse(localStorage.getItem('firebaseUser'));
+        const firebaseAuth = JSON.parse(localStorage.getItem('firebaseAuth'));
         
         return {
             telegram: telegramUser,
-            firebase: firebaseUser
+            firebase: firebaseUser,
+            auth: firebaseAuth
         };
     } catch (error) {
+        console.error('Error getting user data:', error);
         return null;
     }
 }
@@ -31,17 +35,23 @@ function getCurrentUser() {
 function logout() {
     localStorage.removeItem('telegramUser');
     localStorage.removeItem('firebaseUser');
+    localStorage.removeItem('firebaseAuth');
     window.location.href = '/';
 }
 
 // Функция для удаления аккаунта
 function deleteAccount() {
     if (confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.')) {
-        // Очищаем localStorage
-        localStorage.removeItem('telegramUser');
-        localStorage.removeItem('firebaseUser');
-        alert('Аккаунт удален (в демо-версии только из localStorage)');
-        window.location.href = '/';
+        if (typeof deleteCurrentUser === 'function') {
+            deleteCurrentUser();
+        } else {
+            // Fallback если функция недоступна
+            localStorage.removeItem('telegramUser');
+            localStorage.removeItem('firebaseUser');
+            localStorage.removeItem('firebaseAuth');
+            alert('Аккаунт удален из localStorage');
+            window.location.href = '/';
+        }
     }
 }
 
@@ -58,21 +68,57 @@ function addAccountControls() {
     controlsContainer.style.fontFamily = 'Arial, sans-serif';
     
     controlsContainer.innerHTML = `
-        <div style="background: rgba(0,0,0,0.8); padding: 10px; border-radius: 5px; color: white; font-size: 14px;">
-            <div style="margin-bottom: 8px;">
+        <div style="background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; color: white; font-size: 14px; min-width: 200px;">
+            <div style="margin-bottom: 10px; border-bottom: 1px solid #555; padding-bottom: 8px;">
                 <strong>${user.telegram.first_name || 'User'}</strong>
-                ${user.telegram.username ? `(@${user.telegram.username})` : ''}
+                ${user.telegram.username ? `<br>@${user.telegram.username}` : ''}
+                ${user.firebase ? `<br><small>ID: ${user.firebase.telegramId}</small>` : ''}
             </div>
-            <button onclick="logout()" style="margin: 2px; padding: 5px 10px; background: #666; color: white; border: none; border-radius: 3px; cursor: pointer;">Logout</button>
-            <button onclick="deleteAccount()" style="margin: 2px; padding: 5px 10px; background: #ff4444; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete Account</button>
+            <button onclick="logout()" style="margin: 2px; padding: 8px 12px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">Выйти</button>
+            <button onclick="deleteAccount()" style="margin: 2px; padding: 8px 12px; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">Удалить аккаунт</button>
         </div>
     `;
     
     document.body.appendChild(controlsContainer);
 }
 
+// Сохранение игрового прогресса в Firebase
+function saveGameProgress(progressData) {
+    const user = getCurrentUser();
+    if (!user || !user.firebase) return;
+    
+    try {
+        if (typeof firebase !== 'undefined') {
+            firebase.database().ref('gameProgress/' + user.firebase.telegramId).set({
+                ...progressData,
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
+            });
+            console.log('Game progress saved to Firebase');
+        }
+    } catch (error) {
+        console.error('Error saving game progress:', error);
+    }
+}
+
+// Загрузка игрового прогресса из Firebase
+async function loadGameProgress() {
+    const user = getCurrentUser();
+    if (!user || !user.firebase) return null;
+    
+    try {
+        if (typeof firebase !== 'undefined') {
+            const snapshot = await firebase.database().ref('gameProgress/' + user.firebase.telegramId).once('value');
+            return snapshot.exists() ? snapshot.val() : null;
+        }
+    } catch (error) {
+        console.error('Error loading game progress:', error);
+    }
+    
+    return null;
+}
+
 // Инициализация при загрузке
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Проверяем авторизацию
     if (!checkAuthentication()) {
         return;
@@ -81,20 +127,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Добавляем элементы управления
     addAccountControls();
     
+    // Загружаем игровой прогресс
+    const savedProgress = await loadGameProgress();
+    if (savedProgress) {
+        console.log('Loaded game progress:', savedProgress);
+        // Восстанавливаем прогресс игры
+    }
+    
     // Ваш существующий код игры здесь...
     console.log('Game initialized for user:', getCurrentUser().telegram.first_name);
+    
+    // Пример сохранения прогресса
+    // saveGameProgress({ level: 1, score: 1000 });
 });
 
 // Делаем функции глобальными для использования в HTML
 window.logout = logout;
 window.deleteAccount = deleteAccount;
-
-// Добавляем элементы управления после загрузки DOM
-document.addEventListener('DOMContentLoaded', function() {
-    if (currentUser) {
-        addAccountControls();
-    }
-});
 
 class Game {
     constructor() {

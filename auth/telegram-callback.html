@@ -20,14 +20,22 @@
             text-align: center;
             padding: 20px;
         }
-        .delete-btn {
-            background: #ff4444;
+        .success {
+            color: green;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            background: #007bff;
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            margin: 20px;
+            margin: 10px;
+        }
+        .delete-btn {
+            background: #ff4444;
         }
     </style>
 </head>
@@ -35,51 +43,86 @@
     <div id="loading" class="loading">
         <h2>Авторизация...</h2>
         <p>Пожалуйста, подождите</p>
+        <div id="auth-steps">
+            <p>1. Получение данных из Telegram...</p>
+            <p>2. Проверка пользователя в Firebase...</p>
+            <p>3. Перенаправление в игру...</p>
+        </div>
+    </div>
+    
+    <div id="success" class="success" style="display: none;">
+        <h2>Авторизация успешна!</h2>
+        <p>Перенаправление в игру...</p>
     </div>
     
     <div id="error" class="error" style="display: none;">
         <h2>Ошибка авторизации</h2>
         <p id="error-message"></p>
         <button onclick="window.location.href='/'">Вернуться на главную</button>
+        <button class="delete-btn" onclick="deleteCurrentUser()">Удалить аккаунт (для теста)</button>
     </div>
 
     <script>
-        // Функция для получения параметров из URL
-        function getUrlParams() {
-            const params = {};
-            const queryString = window.location.hash.substring(1);
-            const regex = /([^&=]+)=([^&]*)/g;
-            let m;
+        // Функция для получения параметров из URL Telegram
+        function getTelegramAuthData() {
+            console.log('Current URL:', window.location.href);
+            console.log('URL hash:', window.location.hash);
             
-            while (m = regex.exec(queryString)) {
-                params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+            // Telegram передает данные в hash части URL
+            const hash = window.location.hash.substr(1);
+            if (!hash) {
+                throw new Error('No authentication data found in URL');
             }
             
-            return params;
+            const params = new URLSearchParams(hash);
+            const user = {};
+            
+            // Проверяем обязательные поля
+            if (!params.get('id')) {
+                throw new Error('User ID not found in authentication data');
+            }
+            
+            // Собираем данные пользователя
+            user.id = parseInt(params.get('id'));
+            user.first_name = params.get('first_name') || '';
+            user.last_name = params.get('last_name') || '';
+            user.username = params.get('username') || '';
+            user.photo_url = params.get('photo_url') || '';
+            user.auth_date = parseInt(params.get('auth_date')) || 0;
+            user.hash = params.get('hash') || '';
+            
+            console.log('Parsed user data:', user);
+            return user;
         }
 
         // Обработка данных авторизации
         async function processAuth() {
             try {
-                const params = getUrlParams();
+                console.log('Starting authentication process...');
                 
-                if (params.id) {
-                    const user = {
-                        id: parseInt(params.id),
-                        first_name: params.first_name || '',
-                        last_name: params.last_name || '',
-                        username: params.username || '',
-                        photo_url: params.photo_url || '',
-                        auth_date: parseInt(params.auth_date),
-                        hash: params.hash
-                    };
+                const user = getTelegramAuthData();
+                
+                if (user && user.id) {
+                    console.log('User data received, starting Firebase auth...');
                     
-                    // Ждем немного чтобы Firebase успел загрузиться
+                    // Обновляем статус в UI
+                    document.getElementById('auth-steps').innerHTML = `
+                        <p>✓ Данные из Telegram получены</p>
+                        <p>2. Проверка пользователя в Firebase...</p>
+                        <p>3. Перенаправление в игру...</p>
+                    `;
+                    
+                    // Даем время Firebase инициализироваться
                     setTimeout(() => {
-                        handleTelegramAuth(user);
-                    }, 1000);
+                        if (typeof handleTelegramAuth === 'function') {
+                            handleTelegramAuth(user);
+                        } else {
+                            throw new Error('Auth function not loaded');
+                        }
+                    }, 2000);
+                    
                 } else {
-                    throw new Error('Не удалось получить данные пользователя');
+                    throw new Error('Не удалось получить данные пользователя из Telegram');
                 }
             } catch (error) {
                 console.error('Auth processing error:', error);
@@ -90,7 +133,11 @@
         }
 
         // Запускаем обработку при загрузке страницы
-        document.addEventListener('DOMContentLoaded', processAuth);
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, starting auth process...');
+            // Даем время Firebase SDK загрузиться
+            setTimeout(processAuth, 1000);
+        });
     </script>
 </body>
 </html>
