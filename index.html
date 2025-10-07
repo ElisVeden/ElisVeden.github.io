@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рунный Следопыт | The Code Weaver</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Raleway:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Telegram Login Widget -->
+    <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="code_weaver_gamebot"
+        data-size="large" data-auth-url="/auth/telegram" data-request-access="write"></script>
+</head>
+
+<body>
+    <div class="stars-background"></div>
+
+    <div class="container">
+        <!-- Заголовок с анимацией -->
+        <header class="game-header">
+            <h1 class="game-title" id="mainTitle">
+                <span class="title-ru">Рунный Следопыт</span>
+                <span class="title-en">The Code Weaver</span>
+            </h1>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Секция описания игры -->
+            <section class="game-description">
+                <div class="description-card">
+                    <p class="story-text">
+                        В мире, где время застыло в бесконечном цикле, только ты можешь восстановить ход реальности.
+                        Используй древний язык Рунного Кода, чтобы исправлять искажения времени и спасти мир от вечного
+                        зацикливания.
+                    </p>
+
+                    <div class="gameplay-features">
+                        <p class="features-title">Используй базовые знания программирования для решения головоломок:</p>
+                        <div class="features-grid">
+                            <div class="feature">
+                                <i class="fas fa-code-branch"></i>
+                                <span>Условные операторы для изменения реальности</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-redo-alt"></i>
+                                <span>Циклы для управления повторяющимися событиями</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-magic"></i>
+                                <span>Функции для создания магических заклинаний</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-project-diagram"></i>
+                                <span>Логические операторы для решения сложных задач</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="game-info">
+                        <!-- Сворачиваемый блок жанров -->
+                        <div class="collapse-section">
+                            <div class="collapse-header" onclick="toggleCollapse('genres')">
+                                <h3><i class="fas fa-chevron-down"></i> Жанры</h3>
+                                <span class="collapse-icon"></span>
+                            </div>
+                            <div class="collapse-content" id="genres">
+                                <div class="tags">
+                                    <span class="tag">Визуальная новелла</span>
+                                    <span class="tag">Обучение программированию</span>
+                                    <span class="tag">Фэнтези</span>
+                                    <span class="tag">Рогалик</span>
+                                    <span class="tag">Метроидвания</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Сворачиваемый блок требований -->
+                        <div class="collapse-section">
+                            <div class="collapse-header" onclick="toggleCollapse('requirements')">
+                                <h3><i class="fas fa-chevron-down"></i> Требования</h3>
+                                <span class="collapse-icon"></span>
+                            </div>
+                            <div class="collapse-content" id="requirements">
+                                <div class="req-list">
+                                    <div class="req-item">
+                                        <span class="req-label">Возраст:</span>
+                                        <span class="req-value">16+</span>
+                                    </div>
+                                    <div class="req-item">
+                                        <span class="req-label">Знания программирования:</span>
+                                        <span class="req-value">Базовые концепции C#, Python, Java или JavaScript</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Кнопки действий -->
+            <section class="action-buttons">
+                <button class="btn btn-primary" id="loginBtn">Войти в мир</button>
+                <!-- <button class="btn btn-secondary" id="playDemoBtn">Попробовать демо</button> -->
+            </section>
+        </main>
+
+        <!-- Футер -->
+        <footer class="footer">
+            <div class="footer-links">
+                <button class="link-btn" id="creditsBtn">Титры</button>
+                <a href="https://t.me/code_weaver_gamebot" class="link-btn" target="_blank">Наш бот</a>
+                <a href="/wiki" class="link-btn">Wiki</a>
+                <a href="https://github.com/yourrepo" class="link-btn" target="_blank">GitHub</a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 Рунный Следопыт.
+            </div>
+        </footer>
+    </div>
+
+    <div id="authModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+
+            <div class="telegram-auth-header">
+                <i class="fab fa-telegram"></i>
+                <h2>Вход через Telegram</h2>
+            </div>
+
+            <p class="auth-description">
+                Для игры требуется авторизация через нашего бота
+            </p>
+
+            <!-- Telegram Login Widget -->
+            <div id="telegram-login-container"></div>
+
+            <div class="bot-instructions">
+                <h3>Как подключиться:</h3>
+                <div class="instruction-step">
+                    <span class="step-number">1</span>
+                    <span>Нажмите кнопку выше</span>
+                </div>
+                <div class="instruction-step">
+                    <span class="step-number">2</span>
+                    <span>Разрешите доступ в Telegram</span>
+                </div>
+                <div class="instruction-step">
+                    <span class="step-number">3</span>
+                    <span>Начните игру!</span>
+                </div>
+            </div>
+
+            <div class="bot-link">
+                <p>Или перейдите прямо к боту:</p>
+                <a href="https://t.me/code_weaver_gamebot" class="btn btn-telegram" target="_blank">
+                    <i class="fab fa-telegram"></i>
+                    @code_weaver_gamebot
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
