@@ -1,28 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Авторизация</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация завершена | Рунный Следопыт</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .success-icon {
+            font-size: 3rem;
+            color: #0088cc;
+            margin-bottom: 1rem;
+        }
+        .loading {
+            display: none;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="success-icon">✓</div>
+        <h1>Авторизация завершена!</h1>
+        <p>Возвращаемся в игру...</p>
+        <div class="loading" id="loading">
+            <p>Если перенаправление не произошло автоматически, <a href="/" id="manualLink">нажмите сюда</a></p>
+        </div>
+    </div>
+
     <script>
-        // Получаем данные из URL
-        const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const userData = {};
-        
-        for (const [key, value] of urlParams) {
-            userData[key] = value;
+        function processTelegramAuth() {
+            try {
+                // Получаем данные из URL параметров
+                const urlParams = new URLSearchParams(window.location.search);
+                const userData = {};
+                
+                // Собираем все параметры
+                for (const [key, value] of urlParams) {
+                    userData[key] = value;
+                }
+
+                console.log('Получены данные авторизации:', userData);
+
+                if (Object.keys(userData).length > 0) {
+                    // Сохраняем в localStorage
+                    localStorage.setItem('telegramUserData', JSON.stringify(userData));
+                    localStorage.setItem('isAuthenticated', 'true');
+                    
+                    // Передаем данные в opener если есть
+                    if (window.opener && !window.opener.closed) {
+                        try {
+                            if (window.opener.handleTelegramAuth) {
+                                window.opener.handleTelegramAuth(userData);
+                            }
+                            window.close();
+                            return;
+                        } catch (e) {
+                            console.log('Не удалось передать данные в opener:', e);
+                        }
+                    }
+                    
+                    // Если нет opener, перенаправляем на главную
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                    
+                } else {
+                    document.getElementById('loading').style.display = 'block';
+                    document.getElementById('manualLink').href = '/';
+                }
+                
+            } catch (error) {
+                console.error('Ошибка обработки авторизации:', error);
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('manualLink').href = '/';
+            }
         }
 
-        // Передаем данные в основное окно
-        if (window.opener) {
-            window.opener.handleTelegramAuth(userData);
-            window.close();
-        } else {
-            // Если открыто в той же вкладке
-            localStorage.setItem('telegramAuthData', JSON.stringify(userData));
-            window.location.href = '/'; // Возврат на главную
-        }
-        
+        // Запускаем обработку при загрузке
+        document.addEventListener('DOMContentLoaded', processTelegramAuth);
     </script>
 </body>
 </html>

@@ -33,15 +33,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const script = document.createElement('script');
         script.src = 'https://telegram.org/js/telegram-widget.js?22';
-        script.setAttribute('data-telegram-login', 'сode_weaver_gamebot'); // ЗАМЕНИТЕ на ваш username бота
+        script.setAttribute('data-telegram-login', 'code_weaver_gamebot'); // Убедитесь что имя бота правильное
         script.setAttribute('data-size', 'large');
-        script.setAttribute('data-auth-url', 'auth/telegram-callback.html');
+        script.setAttribute('data-auth-url', 'https://elisveden.github.io/auth/telegram-callback.html'); // Полный URL
         script.setAttribute('data-request-access', 'write');
         script.async = true;
 
         container.appendChild(script);
 
-        console.log('Telegram Widget инициализирован для бота: сode_weaver_gamebot');
+        console.log('Telegram Widget инициализирован для бота: code_weaver_gamebot');
     }
 
     // В script.js обновите функцию handleTelegramAuth
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function startGame() {
         console.log('Игра началась!');
         // Здесь будет переход к основной игре
-        // window.location.href = '/game.html';
+         window.location.href = '/game.html';
     }
 });
 
@@ -142,10 +142,10 @@ function toggleCollapse(id, forceOpen = false) {
     }
 }
 
-// Автоматически открываем жанры и требования при загрузке
+/* // Автоматически открываем жанры и требования при загрузке
 document.addEventListener('DOMContentLoaded', function () {
     setTimeout(() => {
         toggleCollapse('genres', true);
         toggleCollapse('requirements', true);
     }, 1000);
-});
+}); */
