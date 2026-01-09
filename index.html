@@ -1,187 +1,105 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Рунный Следопыт | The Code Weaver</title>
+    <title>📚 English Story Dictionary</title>
     <link rel="stylesheet" href="style.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Raleway:wght@300;400;500&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
 </head>
-
 <body>
-    <div class="stars-background"></div>
-
     <div class="container">
-        <!-- Заголовок с анимацией -->
-        <header class="game-header">
-            <h1 class="game-title" id="mainTitle">
-                <span class="title-ru">Рунный Следопыт</span>
-                <span class="title-en">The Code Weaver</span>
-            </h1>
+        <!-- Заголовок -->
+        <header>
+            <h1><i class="fas fa-book-open"></i> English Story Dictionary</h1>
+            <p class="subtitle">Словарь к главам обучающего Telegram-канала</p>
         </header>
 
-        <!-- Основной контент -->
-        <main class="main-content">
-            <!-- Секция описания игры -->
-            <section class="game-description">
-                <div class="description-card">
-                    <p class="story-text">
-                        В мире, где время застыло в бесконечном цикле, только ты можешь восстановить ход реальности.
-                        Используй древний язык Рунного Кода, чтобы исправлять искажения времени и спасти мир от вечного
-                        зацикливания.
-                    </p>
-
-                    <div class="gameplay-features">
-                        <p class="features-title">Используй базовые знания программирования для решения головоломок:</p>
-                        <div class="features-grid">
-                            <div class="feature">
-                                <i class="fas fa-code-branch"></i>
-                                <span>Условные операторы для изменения реальности</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-redo-alt"></i>
-                                <span>Циклы для управления повторяющимися событиями</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-magic"></i>
-                                <span>Функции для создания магических заклинаний</span>
-                            </div>
-                            <div class="feature">
-                                <i class="fas fa-project-diagram"></i>
-                                <span>Логические операторы для решения сложных задач</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="game-info">
-                        <!-- Сворачиваемый блок жанров -->
-                        <div class="collapse-section">
-                            <div class="collapse-header" onclick="toggleCollapse('genres')">
-                                <h3><i class="fas fa-chevron-down"></i> Жанры</h3>
-                                <span class="collapse-icon"></span>
-                            </div>
-                            <div class="collapse-content" id="genres">
-                                <div class="tags">
-                                    <span class="tag">Визуальная новелла</span>
-                                    <span class="tag">Обучение программированию</span>
-                                    <span class="tag">Фэнтези</span>
-                                    <span class="tag">Рогалик</span>
-                                    <span class="tag">Метроидвания</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Сворачиваемый блок требований -->
-                        <div class="collapse-section">
-                            <div class="collapse-header" onclick="toggleCollapse('requirements')">
-                                <h3><i class="fas fa-chevron-down"></i> Требования</h3>
-                                <span class="collapse-icon"></span>
-                            </div>
-                            <div class="collapse-content" id="requirements">
-                                <div class="req-list">
-                                    <div class="req-item">
-                                        <span class="req-label">Возраст:</span>
-                                        <span class="req-value">16+</span>
-                                    </div>
-                                    <div class="req-item">
-                                        <span class="req-label">Знания программирования:</span>
-                                        <span class="req-value">Базовые концепции C#, Python, Java или JavaScript</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Кнопки действий -->
-            <section class="action-buttons">
-                <button class="btn btn-primary" id="loginBtn">Войти в мир</button>
-                <!-- <button class="btn btn-secondary" id="playDemoBtn">Попробовать демо</button> -->
-            </section>
-        </main>
-
-        <!-- Футер -->
-        <footer class="footer">
-            <div class="footer-links">
-                <button class="link-btn" id="creditsBtn">Титры</button>
-                <a href="https://t.me/code_weaver_gamebot" class="link-btn" target="_blank">Наш бот</a>
-                <a href="/wiki" class="link-btn">Wiki</a>
-                <a href="https://github.com/yourrepo" class="link-btn" target="_blank">GitHub</a>
+        <!-- Панель управления -->
+        <div class="control-panel">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="🔍 Искать на русском или английском...">
+                <button id="clearSearch" title="Очистить поиск"><i class="fas fa-times"></i></button>
             </div>
-            <div class="copyright">
-                &copy; 2025 Рунный Следопыт.
+            
+            <div class="button-group">
+                <button id="toggleFavorites" class="btn-fav">
+                    <i class="far fa-star"></i> Избранное (<span id="favCount">0</span>)
+                </button>
+                <button id="shareBtn" class="btn-share">
+                    <i class="fas fa-share-alt"></i> Поделиться
+                </button>
+                <button id="feedbackBtn" class="btn-feedback">
+                    <i class="fas fa-bug"></i> Сообщить об ошибке
+                </button>
             </div>
-        </footer>
+        </div>
+
+        <!-- Вкладки -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="dictionary">📖 Словарь по главам</button>
+            <button class="tab-btn" data-tab="favorites">⭐ Избранное</button>
+        </div>
+
+        <!-- Контейнер для словаря -->
+        <div id="dictionaryTab" class="tab-content active">
+            <div id="chaptersContainer"></div>
+        </div>
+
+        <!-- Контейнер для избранного -->
+        <div id="favoritesTab" class="tab-content">
+            <div id="favoritesContainer">
+                <p class="empty-message">У вас пока нет избранных слов. Нажмите ☆ чтобы добавить.</p>
+            </div>
+        </div>
+
+        <!-- Статистика -->
+        <div class="stats">
+            <span>Всего слов: <span id="totalWords">0</span></span>
+            <span>Избранных: <span id="favCountStat">0</span></span>
+            <span>Глав: <span id="chapterCount">0</span></span>
+        </div>
     </div>
 
-    <div id="authModal" class="modal hidden">
+    <!-- Модальное окно для фидбека -->
+    <div id="feedbackModal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
-
-            <div class="telegram-auth-header">
-                <i class="fab fa-telegram"></i>
-                <h2>Вход через Telegram</h2>
-            </div>
-
-            <p class="auth-description">
-                Для игры требуется авторизация через нашего бота
-            </p>
-
-            <!-- Telegram Login Widget -->
-            <div id="telegram-login-container">
-                <script>
-                    // Создаем виджет после загрузки DOM
-                    function loadTelegramWidget() {
-                        const script = document.createElement('script');
-                        script.src = 'https://telegram.org/js/telegram-widget.js?22';
-                        script.setAttribute('data-telegram-login', 'code_weaver_gamebot');
-                        script.setAttribute('data-size', 'large');
-                        script.setAttribute('data-auth-url', 'https://elisveden.github.io/telegram-callback.html');
-                        script.setAttribute('data-request-access', 'write');
-                        script.async = true;
-                        
-                        document.getElementById('telegram-login-container').appendChild(script);
-                    }
-                    
-                    // Загружаем виджет когда модальное окно открывается
-                    document.getElementById('loginBtn').addEventListener('click', function() {
-                        setTimeout(loadTelegramWidget, 100);
-                    });
-                </script>
-            </div>
-
-            <div class="bot-instructions">
-                <h3>Как подключиться:</h3>
-                <div class="instruction-step">
-                    <span class="step-number">1</span>
-                    <span>Нажмите кнопку выше</span>
-                </div>
-                <div class="instruction-step">
-                    <span class="step-number">2</span>
-                    <span>Разрешите доступ в Telegram</span>
-                </div>
-                <div class="instruction-step">
-                    <span class="step-number">3</span>
-                    <span>Начните игру!</span>
-                </div>
-            </div>
-
-            <div class="bot-link">
-                <p>Или перейдите прямо к боту:</p>
-                <a href="https://t.me/code_weaver_gamebot" class="btn btn-telegram" target="_blank">
-                    <i class="fab fa-telegram"></i>
-                    @code_weaver_gamebot
-                </a>
+            <h2><i class="fas fa-bug"></i> Сообщить об ошибке</h2>
+            <textarea id="feedbackText" placeholder="Опишите ошибку или предложение по улучшению словаря..."></textarea>
+            <div class="modal-buttons">
+                <button id="sendFeedback" class="btn-primary">Отправить</button>
+                <button id="cancelFeedback" class="btn-secondary">Отмена</button>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
-</body>
+    <!-- Модальное окно для шаринга -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content share-modal">
+            <span class="close-modal">&times;</span>
+            <h2><i class="fas fa-share-alt"></i> Поделиться словарем</h2>
+            <div class="share-buttons">
+                <button class="share-option" data-platform="telegram">
+                    <i class="fab fa-telegram"></i> Telegram
+                </button>
+                <button class="share-option" data-platform="whatsapp">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+                <button class="share-option" data-platform="vk">
+                    <i class="fab fa-vk"></i> ВКонтакте
+                </button>
+                <button class="share-option" data-platform="email">
+                    <i class="fas fa-envelope"></i> Email
+                </button>
+                <button class="share-option" data-platform="copy">
+                    <i class="fas fa-link"></i> Копировать ссылку
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <script src="app.js"></script>
+</body>
 </html>
