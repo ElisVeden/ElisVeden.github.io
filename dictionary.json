@@ -1,0 +1,52 @@
+{
+  "words": [
+    {
+      "id": 1,
+      "english": "gut feeling",
+      "transcription": "[ɡʌt ˈfiːlɪŋ]",
+      "russian": "интуиция, внутреннее чутьё",
+      "examples": ["Его gut feeling подсказывало идти в лес.", "Trust your gut feeling on this decision."],
+      "chapter": "1.1"
+    },
+    {
+      "id": 2,
+      "english": "blend in",
+      "transcription": "[blend ɪn]",
+      "russian": "сливаться, не выделяться",
+      "examples": ["Он пытался blend in с толпой.", "The animal's coloring helps it blend in with its surroundings."],
+      "chapter": "1.1"
+    },
+    {
+      "id": 3,
+      "english": "break the ice",
+      "transcription": "[breɪk ðə aɪs]",
+      "russian": "растопить лёд, начать общение",
+      "examples": ["Он рассказал шутку, чтобы break the ice.", "Playing a game helped break the ice at the party."],
+      "chapter": "1.2"
+    },
+    {
+      "id": 4,
+      "english": "hit the books",
+      "transcription": "[hɪt ðə bʊks]",
+      "russian": "усердно учиться, заниматься",
+      "examples": ["Мне нужно hit the books перед экзаменом.", "She's hitting the books for her final exams."],
+      "chapter": "1.2"
+    },
+    {
+      "id": 5,
+      "english": "piece of cake",
+      "transcription": "[piːs əv keɪk]",
+      "russian": "очень просто, пустяковое дело",
+      "examples": ["Этот тест был piece of cake.", "Fixing the computer was a piece of cake for him."],
+      "chapter": "2.1"
+    },
+    {
+      "id": 6,
+      "english": "bend over backwards",
+      "transcription": "[bend ˈoʊvər ˈbækwərdz]",
+      "russian": "из кожи вон лезть, очень стараться",
+      "examples": ["Он bent over backwards чтобы помочь ей.", "The teacher bent over backwards to help her students succeed."],
+      "chapter": "2.1"
+    }
+  ]
+}
