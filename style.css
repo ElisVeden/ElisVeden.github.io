@@ -593,3 +593,113 @@ header h1 {
 .word-card {
     animation: fadeInUp 0.5s ease backwards;
 }
+/* Кнопки поделиться на карточке */
+.word-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #e0e0e0;
+}
+
+.share-word-btn {
+    background-color: #e9ecef;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+    color: #495057;
+    font-weight: 500;
+}
+
+.share-word-btn:hover {
+    background-color: #dee2e6;
+    transform: translateY(-2px);
+}
+
+.share-word-btn i {
+    color: var(--primary-color);
+}
+
+/* Модальное окно для шаринга слова */
+#wordShareModal .share-content {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.share-preview {
+    background-color: #f8f9fa;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 4px solid var(--primary-color);
+}
+
+.share-preview h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.share-preview p {
+    margin: 8px 0;
+}
+
+.share-platforms {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.share-platform {
+    padding: 15px 10px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+}
+
+.share-platform:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary-color);
+}
+
+.share-platform i {
+    font-size: 1.5rem;
+}
+
+/* Адаптивность для кнопок */
+@media (max-width: 768px) {
+    .word-actions {
+        flex-direction: column;
+    }
+    
+    .share-platforms {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .share-platforms {
+        grid-template-columns: 1fr;
+    }
+    
+    .share-word-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
