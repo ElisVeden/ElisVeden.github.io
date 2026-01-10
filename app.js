@@ -12,18 +12,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalWordsElement = document.getElementById('totalWords');
     const chapterCountElement = document.getElementById('chapterCount');
     const tabBtns = document.querySelectorAll('.tab-btn');
+    const testContainer = document.getElementById('testContainer');
+    const startTestBtn = document.getElementById('startTest');
+    const includeExamplesCheckbox = document.getElementById('includeExamples');
+    const onlyFavoritesCheckbox = document.getElementById('onlyFavorites');
+    const chapterSelect = document.getElementById('chapterSelect');
+    const questionsCountInput = document.getElementById('questionsCount');
     
     // Модальные окна
     const feedbackModal = document.getElementById('feedbackModal');
     const shareModal = document.getElementById('shareModal');
-    const wordShareModal = document.getElementById('wordShareModal');
     const closeModalBtns = document.querySelectorAll('.close-modal');
     
     // Данные
     let dictionary = [];
     let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     let currentTab = 'dictionary';
-    let currentWordForShare = null;
     
     // Загрузка данных
     async function loadDictionary() {
@@ -151,14 +155,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }, index * 50);
         });
         
-        // Добавление обработчиков для кнопок избранного и шаринга
-        addWordActionHandlers();
+        // Добавление обработчиков для кнопок избранного
+        addFavoriteHandlers();
     }
     
     // Создание карточки слова
     function createWordCard(word) {
         const isFavorite = favorites.includes(word.id);
-        const example = word.examples && word.examples.length > 0 ? word.examples[0] : '';
         
         return `
             <div class="word-card ${isFavorite ? 'favorite' : ''}" data-id="${word.id}">
@@ -178,11 +181,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         </ul>
                     </div>
                 ` : ''}
-                <div class="word-actions">
-                    <button class="share-word-btn" data-id="${word.id}">
-                        <i class="fas fa-share-alt"></i> Поделиться словом
-                    </button>
-                </div>
             </div>
         `;
     }
@@ -245,12 +243,11 @@ document.addEventListener('DOMContentLoaded', function() {
             favoritesContainer.appendChild(chapterElement);
         });
         
-        addWordActionHandlers();
+        addFavoriteHandlers();
     }
     
-    // Добавление обработчиков для кнопок
-    function addWordActionHandlers() {
-        // Кнопки избранного
+    // Добавление обработчиков для кнопок избранного
+    function addFavoriteHandlers() {
         document.querySelectorAll('.fav-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -258,181 +255,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 toggleFavorite(wordId);
             });
         });
-        
-        // Кнопки поделиться словом
-        document.querySelectorAll('.share-word-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const wordId = parseInt(this.dataset.id);
-                openWordShareModal(wordId);
-            });
-        });
-    }
-    
-    // Открытие модального окна для шаринга слова
-    function openWordShareModal(wordId) {
-        const word = dictionary.find(w => w.id === wordId);
-        if (!word) return;
-        
-        currentWordForShare = word;
-        
-        // Обновляем содержимое модального окна
-        const modalContent = document.querySelector('#wordShareModal .share-content');
-        const example = word.examples && word.examples.length > 0 ? word.examples[0] : 'Нет примера';
-        
-        modalContent.innerHTML = `
-            <div class="share-preview">
-                <h4>${word.english}</h4>
-                <p><strong>Транскрипция:</strong> ${word.transcription || '—'}</p>
-                <p><strong>Перевод:</strong> ${word.russian}</p>
-                <p><strong>Пример:</strong> ${example}</p>
-                <p><strong>Глава:</strong> ${word.chapter}</p>
-            </div>
-            <h3>Поделиться в:</h3>
-            <div class="share-platforms">
-                <button class="share-platform" data-platform="telegram-word">
-                    <i class="fab fa-telegram"></i> Telegram
-                </button>
-                <button class="share-platform" data-platform="whatsapp-word">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </button>
-                <button class="share-platform" data-platform="vk-word">
-                    <i class="fab fa-vk"></i> ВКонтакте
-                </button>
-                <button class="share-platform" data-platform="twitter-word">
-                    <i class="fab fa-twitter"></i> Twitter
-                </button>
-                <button class="share-platform" data-platform="email-word">
-                    <i class="fas fa-envelope"></i> Email
-                </button>
-                <button class="share-platform" data-platform="copy-word">
-                    <i class="fas fa-link"></i> Копировать
-                </button>
-            </div>
-        `;
-        
-        // Добавляем обработчики для кнопок шаринга
-        modalContent.querySelectorAll('.share-platform').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const platform = this.dataset.platform;
-                shareWord(platform, word);
-            });
-        });
-        
-        wordShareModal.style.display = 'block';
-    }
-    
-    // Функция шаринга слова
-    function shareWord(platform, word) {
-        const currentUrl = window.location.href;
-        const example = word.examples && word.examples.length > 0 ? word.examples[0] : '';
-        
-        // Формируем текст для шаринга
-        const shareText = `📚 Английское слово из словаря:
-
-🔤 ${word.english}
-📝 ${word.transcription || ''}
-🇷🇺 ${word.russian}
-💬 ${example}
-📖 Глава: ${word.chapter}
-
-Изучай английский с нами! ${currentUrl}`;
-        
-        const shareTitle = `Английское слово: ${word.english}`;
-        
-        let shareUrl = '';
-        
-        switch(platform) {
-            case 'telegram-word':
-                shareUrl = `https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(shareText)}`;
-                break;
-            case 'whatsapp-word':
-                shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-                break;
-            case 'vk-word':
-                shareUrl = `https://vk.com/share.php?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(shareTitle)}&description=${encodeURIComponent(shareText)}`;
-                break;
-            case 'twitter-word':
-                shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(currentUrl)}`;
-                break;
-            case 'email-word':
-                shareUrl = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(shareText)}`;
-                break;
-            case 'copy-word':
-                navigator.clipboard.writeText(shareText)
-                    .then(() => showNotification('Текст слова скопирован!', 'success'))
-                    .catch(() => {
-                        // Fallback для старых браузеров
-                        const textArea = document.createElement('textarea');
-                        textArea.value = shareText;
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                        showNotification('Текст слова скопирован!', 'success');
-                    });
-                return;
-        }
-        
-        if (shareUrl) {
-            window.open(shareUrl, '_blank', 'width=600,height=400');
-            showNotification('Открываем окно для отправки...', 'info');
-        }
-        
-        wordShareModal.style.display = 'none';
-    }
-    
-    // Всплывающее уведомление
-    function showNotification(message, type = 'info') {
-        // Создаем элемент уведомления
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.innerHTML = `
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
-        `;
-        
-        // Стили для уведомления
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#d4edda' : '#d1ecf1'};
-            color: ${type === 'success' ? '#155724' : '#0c5460'};
-            padding: 15px 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 10000;
-            animation: slideInRight 0.3s ease;
-            border-left: 4px solid ${type === 'success' ? '#28a745' : '#17a2b8'};
-        `;
-        
-        // Анимация
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes fadeOut {
-                from { opacity: 1; }
-                to { opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        document.body.appendChild(notification);
-        
-        // Автоматическое скрытие через 3 секунды
-        setTimeout(() => {
-            notification.style.animation = 'fadeOut 0.3s ease';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
     }
     
     // Переключение избранного
@@ -441,10 +263,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (index === -1) {
             favorites.push(wordId);
-            showNotification('Слово добавлено в избранное!', 'success');
         } else {
             favorites.splice(index, 1);
-            showNotification('Слово удалено из избранного', 'info');
         }
         
         // Сохранение в localStorage
@@ -521,16 +341,13 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', () => {
             feedbackModal.style.display = 'none';
             shareModal.style.display = 'none';
-            if (wordShareModal) wordShareModal.style.display = 'none';
         });
     });
     
     window.addEventListener('click', (e) => {
-        if (e.target === feedbackModal || e.target === shareModal || 
-            (wordShareModal && e.target === wordShareModal)) {
+        if (e.target === feedbackModal || e.target === shareModal) {
             feedbackModal.style.display = 'none';
             shareModal.style.display = 'none';
-            if (wordShareModal) wordShareModal.style.display = 'none';
         }
     });
     
@@ -539,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const feedbackText = document.getElementById('feedbackText').value.trim();
         
         if (!feedbackText) {
-            showNotification('Пожалуйста, введите сообщение', 'info');
+            alert('Пожалуйста, введите сообщение');
             return;
         }
         
@@ -552,8 +369,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 favoritesCount: favorites.length
             };
             
-            // Создаем и скачиваем файл
+            // В реальном проекте здесь был бы AJAX-запрос на сервер
+            // Для GitHub Pages просто показываем сообщение
             const feedbackMessage = `Текст: ${feedbackData.text}\nВремя: ${feedbackData.timestamp}\n\n---\n\n`;
+            
+            // Создаем и скачиваем файл
             const blob = new Blob([feedbackMessage], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -564,13 +384,13 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showNotification('Спасибо! Файл с сообщением скачан.', 'success');
+            alert('Спасибо за обратную связь! Файл с вашим сообщением скачан.');
             document.getElementById('feedbackText').value = '';
             feedbackModal.style.display = 'none';
             
         } catch (error) {
             console.error('Ошибка при отправке фидбека:', error);
-            showNotification('Произошла ошибка. Попробуйте еще раз.', 'info');
+            alert('Произошла ошибка. Попробуйте еще раз.');
         }
     });
     
@@ -578,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
         feedbackModal.style.display = 'none';
     });
     
-    // Шаринг всего словаря
+    // Шаринг
     document.querySelectorAll('.share-option').forEach(btn => {
         btn.addEventListener('click', function() {
             const platform = this.dataset.platform;
@@ -603,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
                 case 'copy':
                     navigator.clipboard.writeText(url)
-                        .then(() => showNotification('Ссылка скопирована!', 'success'))
+                        .then(() => alert('Ссылка скопирована в буфер обмена!'))
                         .catch(() => {
                             // Fallback для старых браузеров
                             const textArea = document.createElement('textarea');
@@ -612,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             textArea.select();
                             document.execCommand('copy');
                             document.body.removeChild(textArea);
-                            showNotification('Ссылка скопирована!', 'success');
+                            alert('Ссылка скопирована в буфер обмена!');
                         });
                     return;
             }
@@ -637,7 +457,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Escape') {
             feedbackModal.style.display = 'none';
             shareModal.style.display = 'none';
-            if (wordShareModal) wordShareModal.style.display = 'none';
         }
         
         // Ctrl+S для переключения в избранное
@@ -649,4 +468,359 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Инициализация
     loadDictionary();
+
+    // Данные для теста
+    let testQuestions = [];
+    let currentQuestionIndex = 0;
+    let testScore = 0;
+    let userAnswers = [];
+
+    // Функция для заполнения селектора глав
+    function populateChapterSelect() {
+        const chapters = new Set(dictionary.map(word => word.chapter));
+        const sortedChapters = Array.from(chapters).sort((a, b) => {
+            const aParts = a.split('.').map(Number);
+            const bParts = b.split('.').map(Number);
+            for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+                const aVal = aParts[i] || 0;
+                const bVal = bParts[i] || 0;
+                if (aVal !== bVal) return aVal - bVal;
+            }
+            return 0;
+        });
+        
+        sortedChapters.forEach(chapter => {
+            const option = document.createElement('option');
+            option.value = chapter;
+            option.textContent = `Глава ${chapter}`;
+            chapterSelect.appendChild(option);
+        });
+    }
+
+    // Генерация случайных неправильных вариантов ответа
+    function generateWrongOptions(correctWord, count = 3) {
+        const wrongOptions = [];
+        const allWords = dictionary.filter(word => word.id !== correctWord.id);
+        
+        // Берем случайные слова из словаря
+        for (let i = 0; i < count; i++) {
+            if (allWords.length > 0) {
+                const randomIndex = Math.floor(Math.random() * allWords.length);
+                wrongOptions.push(allWords[randomIndex].russian);
+                // Удаляем выбранное слово, чтобы избежать повторов
+                allWords.splice(randomIndex, 1);
+            } else {
+                // Если слов не хватает, добавляем заглушки
+                wrongOptions.push(`Вариант ${i + 1}`);
+            }
+        }
+        
+        return wrongOptions;
+    }
+
+    // Создание вопроса
+    function createQuestion(word, includeExamples) {
+        const questionType = Math.random() > 0.5 ? 'english' : 'russian';
+        let questionText = '';
+        let correctAnswer = '';
+        
+        if (questionType === 'english') {
+            questionText = word.english;
+            if (includeExamples && word.examples && word.examples.length > 0) {
+                // С шансом 30% используем пример вместо слова
+                if (Math.random() < 0.3) {
+                    const randomExample = word.examples[Math.floor(Math.random() * word.examples.length)];
+                    questionText = randomExample;
+                }
+            }
+            correctAnswer = word.russian;
+        } else {
+            questionText = word.russian;
+            correctAnswer = word.english;
+        }
+        
+        const wrongOptions = generateWrongOptions(word, 3);
+        const allOptions = [correctAnswer, ...wrongOptions];
+        
+        // Перемешиваем варианты
+        for (let i = allOptions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+        }
+        
+        return {
+            question: questionText,
+            correctAnswer,
+            options: allOptions,
+            type: questionType,
+            word: word
+        };
+    }
+
+    // Создание теста
+    function createTest() {
+        testQuestions = [];
+        currentQuestionIndex = 0;
+        testScore = 0;
+        userAnswers = [];
+        
+        let wordsPool = dictionary;
+        
+        // Фильтрация по избранному
+        if (onlyFavoritesCheckbox.checked) {
+            wordsPool = wordsPool.filter(word => favorites.includes(word.id));
+        }
+        
+        // Фильтрация по главе
+        const selectedChapter = chapterSelect.value;
+        if (selectedChapter) {
+            wordsPool = wordsPool.filter(word => word.chapter === selectedChapter);
+        }
+        
+        if (wordsPool.length === 0) {
+            alert('Нет слов для теста. Проверьте фильтры.');
+            return false;
+        }
+        
+        const questionsCount = Math.min(parseInt(questionsCountInput.value), wordsPool.length);
+        const includeExamples = includeExamplesCheckbox.checked;
+        
+        // Выбираем случайные слова для теста
+        const selectedWords = [];
+        const usedIndices = new Set();
+        
+        while (selectedWords.length < questionsCount && selectedWords.length < wordsPool.length) {
+            const randomIndex = Math.floor(Math.random() * wordsPool.length);
+            if (!usedIndices.has(randomIndex)) {
+                selectedWords.push(wordsPool[randomIndex]);
+                usedIndices.add(randomIndex);
+            }
+        }
+        
+        // Создаем вопросы
+        selectedWords.forEach(word => {
+            testQuestions.push(createQuestion(word, includeExamples));
+        });
+        
+        return true;
+    }
+
+    // Отображение вопроса
+    function displayQuestion() {
+        if (currentQuestionIndex >= testQuestions.length) {
+            showResults();
+            return;
+        }
+        
+        const question = testQuestions[currentQuestionIndex];
+        const questionNumber = currentQuestionIndex + 1;
+        const totalQuestions = testQuestions.length;
+        
+        testContainer.innerHTML = `
+            <div class="test-container active">
+                <div class="test-question">
+                    <div class="question-type">
+                        ${question.type === 'english' ? '🇺🇸 Переведите с английского' : '🇷🇺 Переведите с русского'}
+                    </div>
+                    <div class="question-text">${question.question}</div>
+                    
+                    <div class="test-options-grid">
+                        ${question.options.map((option, index) => `
+                            <button class="option-btn" data-index="${index}">
+                                ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="test-navigation">
+                        <div>
+                            <div class="test-progress">
+                                Вопрос ${questionNumber} из ${totalQuestions}
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${(questionNumber / totalQuestions) * 100}%"></div>
+                            </div>
+                        </div>
+                        
+                        <button id="nextQuestion" class="btn-test" ${userAnswers[currentQuestionIndex] === undefined ? 'disabled' : ''}>
+                            ${questionNumber === totalQuestions ? 'Завершить тест' : 'Следующий вопрос'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Добавляем обработчики для вариантов ответа
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const selectedIndex = parseInt(this.dataset.index);
+                const isCorrect = question.options[selectedIndex] === question.correctAnswer;
+                
+                // Убираем выделение у всех кнопок
+                document.querySelectorAll('.option-btn').forEach(b => {
+                    b.classList.remove('selected');
+                    b.disabled = true;
+                });
+                
+                // Выделяем выбранную
+                this.classList.add('selected');
+                if (!isCorrect) {
+                    this.classList.add('incorrect');
+                }
+                
+                // Находим правильный ответ и выделяем его
+                const correctIndex = question.options.indexOf(question.correctAnswer);
+                document.querySelector(`.option-btn[data-index="${correctIndex}"]`).classList.add('correct');
+                
+                // Сохраняем ответ
+                userAnswers[currentQuestionIndex] = {
+                    selected: selectedIndex,
+                    correct: correctIndex,
+                    isCorrect: isCorrect
+                };
+                
+                // Обновляем счет
+                if (isCorrect) {
+                    testScore++;
+                }
+                
+                // Активируем кнопку "Далее"
+                document.getElementById('nextQuestion').disabled = false;
+            });
+        });
+        
+        // Обработчик кнопки "Далее"
+        document.getElementById('nextQuestion').addEventListener('click', function() {
+            currentQuestionIndex++;
+            displayQuestion();
+        });
+    }
+
+    // Показать результаты
+    function showResults() {
+        const percentage = Math.round((testScore / testQuestions.length) * 100);
+        let message = '';
+        
+        if (percentage >= 90) message = 'Отлично! Вы знаете эти слова на отлично! 🎉';
+        else if (percentage >= 70) message = 'Хорошо! Но есть что повторить 👍';
+        else if (percentage >= 50) message = 'Неплохо, но нужно больше практики 💪';
+        else message = 'Повторите слова и попробуйте еще раз 📚';
+        
+        testContainer.innerHTML = `
+            <div class="test-results active">
+                <i class="fas fa-trophy" style="font-size: 4rem; color: #ffd700; margin-bottom: 20px;"></i>
+                <h2>Тест завершен!</h2>
+                
+                <div class="result-score">${percentage}%</div>
+                <div class="result-message">${message}</div>
+                
+                <div class="result-details">
+                    <div>
+                        <strong>Правильных ответов:</strong> ${testScore} из ${testQuestions.length}
+                    </div>
+                    <div>
+                        <strong>Время:</strong> ${Math.round(testQuestions.length * 0.5)} мин (примерно)
+                    </div>
+                    <div>
+                        <strong>Точность:</strong> ${percentage}%
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 30px; margin-bottom: 15px;">Разбор ответов:</h3>
+                <div class="answers-review">
+                    ${testQuestions.map((q, index) => {
+                        const answer = userAnswers[index];
+                        const isCorrect = answer?.isCorrect;
+                        
+                        return `
+                            <div class="result-item ${isCorrect ? 'correct' : 'incorrect'}">
+                                <strong>${index + 1}. ${q.question}</strong>
+                                <div>Ваш ответ: ${q.options[answer?.selected] || 'Нет ответа'}</div>
+                                <div>Правильный ответ: ${q.correctAnswer}</div>
+                                ${q.type === 'english' ? 
+                                    `<div class="answer-review">Слово: ${q.word.english} → ${q.word.russian}</div>` :
+                                    `<div class="answer-review">Перевод: ${q.word.russian} → ${q.word.english}</div>`
+                                }
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                
+                <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                    <button id="restartTest" class="btn-test">
+                        <i class="fas fa-redo"></i> Пройти еще раз
+                    </button>
+                    <button id="backToDictionary" class="btn-secondary">
+                        <i class="fas fa-book"></i> К словарю
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Обработчики кнопок в результатах
+        document.getElementById('restartTest').addEventListener('click', startTest);
+        document.getElementById('backToDictionary').addEventListener('click', () => {
+            document.querySelector('[data-tab="dictionary"]').click();
+        });
+    }
+
+    // Запуск теста
+    function startTest() {
+        if (createTest()) {
+            displayQuestion();
+        }
+    }
+
+    // Инициализация теста при переключении на вкладку
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tab = this.dataset.tab;
+            
+            // При переключении на тест, показываем стартовый экран
+            if (tab === 'test') {
+                testContainer.innerHTML = `
+                    <div class="test-start-screen">
+                        <i class="fas fa-brain" style="font-size: 4rem; color: #4361ee; margin-bottom: 20px;"></i>
+                        <h2>Проверьте свои знания</h2>
+                        <p>Выберите настройки и начните тест. Вам будут предложены слова или фразы, и нужно выбрать правильный перевод из 4 вариантов.</p>
+                        <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                            <button id="startTestFromScreen" class="btn-test" style="font-size: 1.1rem; padding: 15px 30px;">
+                                <i class="fas fa-play-circle"></i> Начать тест
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('startTestFromScreen').addEventListener('click', startTest);
+            }
+        });
+    });
+
+    // Обработчик кнопки старта теста
+    startTestBtn.addEventListener('click', startTest);
+
+    // В функции loadDictionary добавляем вызов заполнения глав
+    async function loadDictionary() {
+        try {
+            const response = await fetch('dictionary.json');
+            if (!response.ok) throw new Error('Ошибка загрузки словаря');
+            
+            const data = await response.json();
+            dictionary = data.words || [];
+            
+            updateStats();
+            renderChapters();
+            updateFavoritesCount();
+            populateChapterSelect(); // Добавляем эту строку
+        } catch (error) {
+            console.error('Ошибка загрузки словаря:', error);
+            chaptersContainer.innerHTML = `
+                <div class="empty-message">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px; color: #ff6b6b;"></i>
+                    <h3>Ошибка загрузки словаря</h3>
+                    <p>Пожалуйста, проверьте файл dictionary.json</p>
+                </div>
+            `;
+        }
+    }
 });
