@@ -593,113 +593,240 @@ header h1 {
 .word-card {
     animation: fadeInUp 0.5s ease backwards;
 }
-/* Кнопки поделиться на карточке */
-.word-actions {
+
+/* Стили для теста */
+.test-controls {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 25px;
     display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px dashed #e0e0e0;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
-.share-word-btn {
-    background-color: #e9ecef;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 15px;
-    font-size: 0.9rem;
-    cursor: pointer;
+.test-options {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.test-options label {
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: var(--transition);
-    color: #495057;
-    font-weight: 500;
+    cursor: pointer;
 }
 
-.share-word-btn:hover {
-    background-color: #dee2e6;
+.test-options select,
+.test-options input[type="number"] {
+    padding: 8px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    background: white;
+}
+
+.btn-test {
+    padding: 12px 25px;
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: var(--transition);
+}
+
+.btn-test:hover {
+    background-color: #3aa8d0;
     transform: translateY(-2px);
 }
 
-.share-word-btn i {
-    color: var(--primary-color);
-}
-
-/* Модальное окно для шаринга слова */
-#wordShareModal .share-content {
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.share-preview {
-    background-color: #f8f9fa;
-    border-radius: var(--border-radius);
-    padding: 20px;
-    margin: 20px 0;
-    border-left: 4px solid var(--primary-color);
-}
-
-.share-preview h4 {
-    color: var(--primary-color);
-    margin-bottom: 10px;
-    font-size: 1.1rem;
-}
-
-.share-preview p {
-    margin: 8px 0;
-}
-
-.share-platforms {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.share-platform {
-    padding: 15px 10px;
+/* Экран теста */
+.test-start-screen {
+    text-align: center;
+    padding: 60px 20px;
     background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+/* Контейнер теста */
+.test-container {
+    display: none;
+}
+
+.test-container.active {
+    display: block;
+}
+
+/* Вопрос теста */
+.test-question {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: var(--shadow);
+}
+
+.question-text {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-align: center;
+    color: var(--secondary-color);
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.question-type {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Варианты ответов */
+.test-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.option-btn {
+    padding: 18px;
     border: 2px solid #e0e0e0;
     border-radius: var(--border-radius);
+    background: white;
+    font-size: 1.1rem;
     cursor: pointer;
     transition: var(--transition);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    color: var(--dark-color);
-    font-size: 0.9rem;
+    text-align: left;
 }
 
-.share-platform:hover {
-    transform: translateY(-3px);
+.option-btn:hover {
     border-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-.share-platform i {
-    font-size: 1.5rem;
+.option-btn.selected {
+    border-color: var(--success-color);
+    background-color: rgba(76, 201, 240, 0.1);
 }
 
-/* Адаптивность для кнопок */
-@media (max-width: 768px) {
-    .word-actions {
-        flex-direction: column;
-    }
-    
-    .share-platforms {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.option-btn.correct {
+    border-color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
 }
 
-@media (max-width: 480px) {
-    .share-platforms {
-        grid-template-columns: 1fr;
-    }
-    
-    .share-word-btn {
-        width: 100%;
-        justify-content: center;
-    }
+.option-btn.incorrect {
+    border-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+/* Навигация теста */
+.test-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.test-progress {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--success-color);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Результаты теста */
+.test-results {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 30px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    display: none;
+}
+
+.test-results.active {
+    display: block;
+}
+
+.result-score {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 20px 0;
+}
+
+.result-message {
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+}
+
+.result-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 25px 0;
+    text-align: left;
+}
+
+.result-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: var(--border-radius);
+}
+
+.result-item.correct {
+    border-left: 4px solid #28a745;
+}
+
+.result-item.incorrect {
+    border-left: 4px solid #dc3545;
+}
+
+.answer-review {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #ddd;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Анимации для теста */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.option-btn:active {
+    animation: pulse 0.2s;
 }
