@@ -960,3 +960,136 @@ header h1 {
     border-radius: 10px;
     color: #6c757d;
 }
+
+/* Стили для статистики слов */
+.words-stats-list {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+.words-stats-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.words-stats-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.words-stats-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.words-stats-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.word-stat-item {
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: var(--border-radius);
+    border-left: 4px solid #6c757d;
+    transition: var(--transition);
+}
+
+.word-stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.word-stat-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.word-stat-info {
+    flex: 1;
+}
+
+.word-stat-info strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.word-stat-russian {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.word-stat-numbers {
+    text-align: right;
+    margin-left: 15px;
+}
+
+.word-stat-accuracy {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.word-stat-count {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.word-stat-progress {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.word-stat-progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.word-stat-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Улучшенные стили для истории тестов */
+.history-list {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.history-item {
+    transition: var(--transition);
+}
+
+.history-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Кнопки на стартовом экране теста */
+.test-start-screen .btn-secondary {
+    background: #6c757d;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.test-start-screen .btn-secondary:hover {
+    background: #545b62;
+    transform: translateY(-2px);
+}
