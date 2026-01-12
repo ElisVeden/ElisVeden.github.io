@@ -1517,3 +1517,96 @@ header h1 {
         grid-template-columns: 1fr;
     }
 }
+
+/* Стили для кнопок действий на главной */
+.home-action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.home-action-buttons button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: var(--transition);
+    font-size: 1rem;
+}
+
+.btn-feedback {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.btn-feedback:hover {
+    background-color: #c3e6cb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-donation {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.btn-donation:hover {
+    background-color: #f5c6cb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для кнопки поделиться в карточке слова */
+.word-share-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #4361ee;
+    transition: var(--transition);
+    padding: 5px;
+    border-radius: 4px;
+    opacity: 0.7;
+}
+
+.word-share-btn:hover {
+    opacity: 1;
+    background-color: rgba(67, 97, 238, 0.1);
+    color: #4361ee;
+}
+
+/* Обновим стили для футера карточки слова */
+.word-footer {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.word-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.word-chapter {
+    font-size: 0.85rem;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+.word-footer-buttons {
+    display: flex;
+    gap: 8px;
+}
