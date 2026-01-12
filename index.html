@@ -8,75 +8,146 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
-    <style>
-        /* Дополнительные стили для уведомлений */
-        .notification {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        /* Улучшение модальных окон */
-        .modal-content h2 {
-            margin-bottom: 20px;
-            color: var(--secondary-color);
-        }
-        
-        .modal-content h2 i {
-            margin-right: 10px;
-        }
-        
-        /* Стили для текстовых областей */
-        textarea {
-            font-family: inherit;
-            font-size: 1rem;
-            line-height: 1.5;
-        }
-        
-        textarea:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-            outline: none;
-        }
-    </style>
 </head>
 
 <body>
     <div class="container">
         <!-- Заголовок -->
         <header>
-            <h1><i class="fas fa-book-open"></i> English Story Dictionary</h1>
-            <p class="subtitle">Словарь к главам обучающего Telegram-канала</p>
+            <h1><i class="fas fa-book-open"></i> Barklation Stories Dictionary</h1>
+            <p class="subtitle">
+                Словарь к главам обучающего Telegram-канала 
+                <a href="https://t.me/barklation_stories" target="_blank" class="channel-link">
+                    Barklation Stories 🇬🇧🐶
+                    <i class="fab fa-telegram"></i>
+                </a>
+            </p>
         </header>
 
         <!-- Панель управления -->
         <div class="control-panel">
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="🔍 Искать на русском или английском...">
-                <button id="clearSearch" title="Очистить поиск"><i class="fas fa-times"></i></button>
-            </div>
-
             <div class="button-group">
                 <button id="toggleFavorites" class="btn-fav">
                     <i class="far fa-star"></i> Избранное (<span id="favCount">0</span>)
                 </button>
+                <button id="feedbackBtn" class="btn-feedback">
+                    <i class="fas fa-comment-alt"></i> Обратная связь
+                </button>
                 <button id="shareBtn" class="btn-share">
                     <i class="fas fa-share-alt"></i> Поделиться
                 </button>
-                <button id="feedbackBtn" class="btn-feedback">
-                    <i class="fas fa-bug"></i> Сообщить об ошибке
+                <button id="donationBtn" class="btn-feedback" style="background-color: #f8d7da; color: #721c24;">
+                    <i class="fas fa-heart"></i> Поблагодарить автора
                 </button>
-
             </div>
         </div>
 
         <!-- Вкладки -->
         <div class="tabs">
-            <button class="tab-btn active" data-tab="dictionary">📖 Словарь по главам</button>
-            <button class="tab-btn" data-tab="favorites">⭐ Избранное</button>
-            <button class="tab-btn" data-tab="test">🧪 Тест</button>
+            <button class="tab-btn active" data-tab="home">
+                <i class="fas fa-home"></i> Главная
+            </button>
+            <button class="tab-btn" data-tab="dictionary">
+                <i class="fas fa-book"></i> Словарь по главам
+            </button>
+            <button class="tab-btn" data-tab="favorites">
+                <i class="fas fa-star"></i> Избранное
+            </button>
+            <button class="tab-btn" data-tab="test">
+                <i class="fas fa-brain"></i> Тест
+            </button>
+        </div>
+
+        <!-- Главная страница -->
+        <div id="homeTab" class="tab-content active home-content">
+            <!-- Баннер о канале -->
+            <div class="banner">
+                <div class="banner-content">
+                    <h2><i class="fas fa-bullhorn"></i> Добро пожаловать в Barklation Stories!</h2>
+                    <p>Интерактивное изучение английского через истории о корги Лексе</p>
+                    
+                    <div class="banner-info-grid">
+                        <div class="banner-card">
+                            <h3><i class="fab fa-telegram"></i> О канале</h3>
+                            <p>Серия интерактивных мини-рассказов о корги Лексе! Читаем историю, голосуем за его действия и учим английский в контексте без зубрёжки. Каждый ваш выбор меняет сюжет и характер пса!</p>
+                            <a href="https://t.me/barklation_stories" target="_blank" class="donation-button" style="margin-top: 15px; font-size: 0.9rem; padding: 10px 20px;">
+                                <i class="fab fa-telegram"></i> Перейти в канал
+                            </a>
+                        </div>
+                        
+                        <div class="banner-card">
+                            <h3><i class="fas fa-globe"></i> О сайте</h3>
+                            <p>Здесь собраны все слова, идиомы и фразы из рассказов для быстрого и удобного изучения и повторения. Слова можно добавить в избранное, пройти тест на знание. Пишите пожелания - будут рассмотрены к реализации!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Быстрый доступ -->
+            <div class="quick-access">
+                <div class="quick-card">
+                    <i class="fas fa-book"></i>
+                    <h3>Словарь по главам</h3>
+                    <p>Все слова из рассказов, сгруппированные по главам. Ищите, добавляйте в избранное, изучайте контекст.</p>
+                    <button class="btn-primary go-to-dictionary">
+                        <i class="fas fa-arrow-right"></i> Открыть словарь
+                    </button>
+                </div>
+                
+                <div class="quick-card">
+                    <i class="fas fa-star"></i>
+                    <h3>Избранные слова</h3>
+                    <p>Ваша персональная коллекция слов для повторения. Добавляйте сложные или важные слова.</p>
+                    <button class="btn-primary go-to-favorites">
+                        <i class="fas fa-arrow-right"></i> Открыть избранное
+                    </button>
+                </div>
+                
+                <div class="quick-card">
+                    <i class="fas fa-brain"></i>
+                    <h3>Проверка знаний</h3>
+                    <p>Тестируйте свои знания, отслеживайте прогресс, улучшайте запоминание слов.</p>
+                    <button class="btn-primary go-to-test">
+                        <i class="fas fa-arrow-right"></i> Пройти тест
+                    </button>
+                </div>
+            </div>
+
+            <!-- Баннер с благодарностью -->
+            <div class="donation-card">
+                <div class="donation-content">
+                    <div class="donation-image">
+                        <img src="thanks.jpg" alt="Угостить автора кофе">
+                    </div>
+                    <div class="donation-text">
+                        <h3><i class="fas fa-mug-hot"></i> Угостите автора кофе!</h3>
+                        <p>Если этот проект помогает вам в изучении английского и вы хотите поддержать автора, можете "угостить" его виртуальным кофе ☕</p>
+                        <p>Ваша поддержка поможет развивать проект дальше, добавлять новые функции и истории!</p>
+                        <div class="donation-note">
+                            Это не оплата услуг, а добровольное пожертвование в знак благодарности
+                        </div>
+                        <a href="#" id="donateLink" class="donation-button">
+                            <i class="fas fa-coffee"></i> Угостить кофе
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Статистика на главной -->
+            <div class="stats" style="margin-top: 30px;">
+                <span>Всего слов: <span id="totalWords">0</span></span>
+                <span>Избранных: <span id="favCountStat">0</span></span>
+                <span>Глав: <span id="chapterCount">0</span></span>
+                <span>Пройдено тестов: <span id="testsCount">0</span></span>
+            </div>
         </div>
 
         <!-- Контейнер для словаря -->
-        <div id="dictionaryTab" class="tab-content active">
+        <div id="dictionaryTab" class="tab-content">
+            <div class="search-container" style="margin-bottom: 20px;">
+                <input type="text" id="searchInput" placeholder="🔍 Искать на русском или английском...">
+                <button id="clearSearch" title="Очистить поиск"><i class="fas fa-times"></i></button>
+            </div>
             <div id="chaptersContainer"></div>
         </div>
 
@@ -87,20 +158,39 @@
             </div>
         </div>
 
-        <!-- Статистика -->
-        <div class="stats">
-            <span>Всего слов: <span id="totalWords">0</span></span>
-            <span>Избранных: <span id="favCountStat">0</span></span>
-            <span>Глав: <span id="chapterCount">0</span></span>
+        <!-- Контейнер для теста -->
+        <div id="testTab" class="tab-content">
+            <div class="test-controls">
+                <div class="test-options">
+                    <label>
+                        <input type="checkbox" id="includeExamples" checked>
+                        Включать примеры в вопросы
+                    </label>
+                    <label>
+                        <input type="checkbox" id="onlyFavorites">
+                        Только избранные слова
+                    </label>
+                    <select id="chapterSelect">
+                        <option value="">Все главы</option>
+                        <!-- Главы будут заполнены динамически -->
+                    </select>
+                    <input type="number" id="questionsCount" min="5" max="50" value="10">
+                </div>
+                <button id="startTest" class="btn-test">
+                    <i class="fas fa-play-circle"></i> Начать тест
+                </button>
+            </div>
+            <div id="testContainer"></div>
         </div>
     </div>
 
-    <!-- Модальное окно для фидбека -->
+    <!-- Модальное окно для обратной связи -->
     <div id="feedbackModal" class="modal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
-            <h2><i class="fas fa-bug"></i> Сообщить об ошибке</h2>
-            <textarea id="feedbackText" placeholder="Опишите ошибку или предложение по улучшению словаря..."></textarea>
+            <h2><i class="fas fa-comment-alt"></i> Обратная связь</h2>
+            <p style="margin-bottom: 15px; color: #6c757d;">Расскажите о вашем опыте использования, предложите улучшения или сообщите об ошибках</p>
+            <textarea id="feedbackText" placeholder="Что вам нравится? Что можно улучшить? Есть ли ошибки?..."></textarea>
             <div class="modal-buttons">
                 <button id="sendFeedback" class="btn-primary">Отправить</button>
                 <button id="cancelFeedback" class="btn-secondary">Отмена</button>
@@ -133,31 +223,34 @@
         </div>
     </div>
 
-    <!-- В Index.html, замени блок теста на этот: -->
-    <div id="testTab" class="tab-content">
-        <div class="test-controls">
-            <div class="test-options">
-                <label>
-                    <input type="checkbox" id="includeExamples" checked>
-                    Включать примеры в вопросы
-                </label>
-                <label>
-                    <input type="checkbox" id="onlyFavorites">
-                    Только избранные слова
-                </label>
-                <select id="chapterSelect">
-                    <option value="">Все главы</option>
-                    <!-- Главы будут заполнены динамически -->
-                </select>
-                <input type="number" id="questionsCount" min="5" max="50" value="10">
+    <!-- Модальное окно для благодарности -->
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2><i class="fas fa-heart" style="color: #f5576c;"></i> Благодарим за поддержку!</h2>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="thanks.jpg" alt="Кофе" style="max-width: 300px; border-radius: var(--border-radius); margin-bottom: 20px;">
+                <p style="font-size: 1.1rem; margin-bottom: 15px;">Ваша поддержка очень важна для развития проекта!</p>
+                <p style="color: #6c757d; margin-bottom: 25px;">Вы можете поддержать автора через эти способы:</p>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: var(--border-radius); margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px; color: var(--secondary-color);">
+                        <i class="fas fa-coffee"></i> Способы поддержки
+                    </h3>
+                    <div style="text-align: left;">
+                        <p><strong>1. ЮMoney:</strong> 4100 1234 5678 9012</p>
+                        <p><strong>2. Tinkoff:</strong> 5536 9137 1234 5678</p>
+                        <p><strong>3. PayPal:</strong> author@barklation.com</p>
+                    </div>
+                </div>
+                
+                <div class="donation-note" style="color: #6c757d; font-size: 0.9rem; font-style: italic;">
+                    Это добровольное пожертвование, а не оплата услуг. Спасибо за вашу щедрость!
+                </div>
             </div>
-            <button id="startTest" class="btn-test">
-                <i class="fas fa-play-circle"></i> Начать тест
-            </button>
-        </div>
-
-        <div id="testContainer">
-            <!-- Контент будет заполняться динамически -->
+            <div class="modal-buttons">
+                <button id="closeDonation" class="btn-secondary">Закрыть</button>
+            </div>
         </div>
     </div>
 
