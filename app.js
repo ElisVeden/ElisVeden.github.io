@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchInput');
     const clearSearchBtn = document.getElementById('clearSearch');
     const toggleFavoritesBtn = document.getElementById('toggleFavorites');
-    const shareBtn = document.getElementById('shareBtn');
     const feedbackBtn = document.getElementById('feedbackBtn');
     const favCountElement = document.getElementById('favCount');
     const favCountStat = document.getElementById('favCountStat');
@@ -30,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Модальные окна
     const feedbackModal = document.getElementById('feedbackModal');
-    const shareModal = document.getElementById('shareModal');
     const closeModalBtns = document.querySelectorAll('.close-modal');
 
     // Данные
@@ -189,6 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Создание карточки слова
+    // Создание карточки слова
     function createWordCard(word) {
         const isFavorite = favorites.includes(word.id);
         const wordStats = getWordStats(word.id);
@@ -197,35 +196,42 @@ document.addEventListener('DOMContentLoaded', function () {
             '';
 
         return `
-        <div class="word-card ${isFavorite ? 'favorite' : ''}" data-id="${word.id}">
-            <div class="word-header">
-                <div>
-                    <h3 class="word-english">${word.english}</h3>
-                    ${statsText ? `<div class="word-stats-badge">${statsText}</div>` : ''}
-                </div>
-                <div class="word-header-buttons">
-                    <button class="fav-btn ${isFavorite ? 'favorited' : ''}" data-id="${word.id}" title="${isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}">
-                        <i class="${isFavorite ? 'fas' : 'far'} fa-star"></i>
-                    </button>
-                    <button class="word-feedback-btn" data-word-id="${word.id}" title="Сообщить об ошибке">
-                        <i class="fas fa-bug"></i>
-                    </button>
-                </div>
+    <div class="word-card ${isFavorite ? 'favorite' : ''}" data-id="${word.id}">
+        <div class="word-header">
+            <div>
+                <h3 class="word-english">${word.english}</h3>
+                ${statsText ? `<div class="word-stats-badge">${statsText}</div>` : ''}
             </div>
-            <p class="transcription">${word.transcription || ''}</p>
-            <p class="russian">${word.russian}</p>
-            ${word.examples && word.examples.length > 0 ? `
-                <div class="examples">
-                    <h4>Примеры:</h4>
-                    <ul>
-                        ${word.examples.map(example => `<li>${example}</li>`).join('')}
-                    </div>
-                </div>
-            ` : ''}
-            <div class="word-footer">
-                <span class="word-chapter">Глава ${word.chapter}</span>
+            <div class="word-header-buttons">
+                <button class="fav-btn ${isFavorite ? 'favorited' : ''}" data-id="${word.id}" title="${isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}">
+                    <i class="${isFavorite ? 'fas' : 'far'} fa-star"></i>
+                </button>
+                <button class="word-feedback-btn" data-word-id="${word.id}" title="Сообщить об ошибке">
+                    <i class="fas fa-bug"></i>
+                </button>
             </div>
         </div>
+        <p class="transcription">${word.transcription || ''}</p>
+        <p class="russian">${word.russian}</p>
+        ${word.examples && word.examples.length > 0 ? `
+            <div class="examples">
+                <h4>Примеры:</h4>
+                <ul>
+                    ${word.examples.map(example => `<li>${example}</li>`).join('')}
+                </ul>
+            </div>
+        ` : ''}
+        <div class="word-footer">
+            <div class="word-footer-left">
+                <span class="word-chapter">Глава ${word.chapter}</span>
+            </div>
+            <div class="word-footer-buttons">
+                <button class="word-share-btn" data-word-id="${word.id}" title="Поделиться словом">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            </div>
+        </div>
+    </div>
     `;
     }
 
@@ -291,6 +297,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Добавление обработчиков для кнопок избранного
+    f// Добавление обработчиков для кнопок избранного и поделиться
     function addFavoriteHandlers() {
         document.querySelectorAll('.fav-btn').forEach(btn => {
             btn.addEventListener('click', function (e) {
@@ -308,6 +315,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 const word = dictionary.find(w => w.id === wordId);
                 if (word) {
                     showWordFeedbackModal(word);
+                }
+            });
+        });
+
+        // Добавим обработчики для кнопок поделиться словом
+        document.querySelectorAll('.word-share-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const wordId = parseInt(this.dataset.wordId);
+                const word = dictionary.find(w => w.id === wordId);
+                if (word) {
+                    shareWord(word);
                 }
             });
         });
@@ -378,6 +397,125 @@ document.addEventListener('DOMContentLoaded', function () {
         // Показываем модальное окно
         wordFeedbackModal.style.display = 'block';
         document.getElementById('wordFeedbackText').focus();
+    }
+
+    // Функция для поделиться словом
+    function shareWord(word) {
+        const shareText = `
+📚 Слово из Barklation Stories Dictionary:
+
+💬 Слово/фраза/идиома: "${word.english}"
+🔊 Произношение: "${word.transcription || '—'}"
+📖 Перевод: "${word.russian}"
+📝 Примеры:
+${word.examples ? word.examples.map(ex => `• ${ex}`).join('\n') : '—'}
+
+Изучайте английский с нами: ${window.location.href}
+`;
+
+        // Показать модальное окно для выбора способа шаринга
+        const shareModal = document.createElement('div');
+        shareModal.id = 'wordShareModal';
+        shareModal.className = 'modal';
+        shareModal.innerHTML = `
+    <div class="modal-content share-modal">
+        <span class="close-word-share-modal">&times;</span>
+        <h2><i class="fas fa-share-alt"></i> Поделиться словом</h2>
+        <div class="word-share-preview">
+            <div class="word-share-card">
+                <h3>${word.english}</h3>
+                <p class="transcription">${word.transcription || ''}</p>
+                <p class="russian">${word.russian}</p>
+                ${word.examples && word.examples.length > 0 ? `
+                    <div class="examples">
+                        <strong>Примеры:</strong>
+                        <ul>
+                            ${word.examples.map(example => `<li>${example}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+        <div class="share-buttons">
+            <button class="share-option" data-platform="telegram">
+                <i class="fab fa-telegram"></i> Telegram
+            </button>
+            <button class="share-option" data-platform="whatsapp">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </button>
+            <button class="share-option" data-platform="vk">
+                <i class="fab fa-vk"></i> ВКонтакте
+            </button>
+            <button class="share-option" data-platform="copy">
+                <i class="fas fa-copy"></i> Копировать текст
+            </button>
+        </div>
+    </div>
+    `;
+
+        document.body.appendChild(shareModal);
+
+        // Функция для закрытия модального окна
+        const closeModal = () => {
+            shareModal.style.display = 'none';
+            setTimeout(() => {
+                if (shareModal.parentNode) {
+                    shareModal.parentNode.removeChild(shareModal);
+                }
+            }, 300);
+        };
+
+        // Добавляем обработчики закрытия
+        const closeBtn = shareModal.querySelector('.close-word-share-modal');
+        closeBtn.addEventListener('click', closeModal);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === shareModal) {
+                closeModal();
+            }
+        });
+
+        // Обработчики для кнопок шаринга
+        shareModal.querySelectorAll('.share-option').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const platform = this.dataset.platform;
+
+                switch (platform) {
+                    case 'telegram':
+                        window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(shareText)}`, '_blank');
+                        break;
+                    case 'whatsapp':
+                        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+                        break;
+                    case 'vk':
+                        window.open(`https://vk.com/share.php?title=${encodeURIComponent(word.english)}&comment=${encodeURIComponent(shareText)}&url=${encodeURIComponent(window.location.href)}`, '_blank');
+                        break;
+                    case 'copy':
+                        navigator.clipboard.writeText(shareText)
+                            .then(() => {
+                                showNotification('Текст скопирован в буфер обмена!', 'success');
+                                closeModal();
+                            })
+                            .catch(() => {
+                                // Fallback для старых браузеров
+                                const textArea = document.createElement('textarea');
+                                textArea.value = shareText;
+                                document.body.appendChild(textArea);
+                                textArea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textArea);
+                                showNotification('Текст скопирован в буфер обмена!', 'success');
+                                closeModal();
+                            });
+                        return;
+                }
+
+                closeModal();
+            });
+        });
+
+        // Показать модальное окно
+        shareModal.style.display = 'block';
     }
 
     // Функция отправки фидбека для слова
