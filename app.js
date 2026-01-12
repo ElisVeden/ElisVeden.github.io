@@ -29,6 +29,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
     let currentTab = 'dictionary';
     
+    // Данные для теста
+    let testQuestions = [];
+    let currentQuestionIndex = 0;
+    let testScore = 0;
+    let userAnswers = [];
+    
+    // История тестов
+    let testHistory = JSON.parse(localStorage.getItem('testHistory') || '[]');
+    let currentTestResults = []; // Для отслеживания результатов по словам в текущем тесте
+
     // Загрузка данных
     async function loadDictionary() {
         try {
@@ -38,9 +48,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             dictionary = data.words || [];
             
+            // Загружаем историю тестов
+            testHistory = JSON.parse(localStorage.getItem('testHistory') || '[]');
+            
             updateStats();
             renderChapters();
             updateFavoritesCount();
+            populateChapterSelect();
         } catch (error) {
             console.error('Ошибка загрузки словаря:', error);
             chaptersContainer.innerHTML = `
@@ -162,11 +176,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Создание карточки слова
     function createWordCard(word) {
         const isFavorite = favorites.includes(word.id);
+        const wordStats = getWordStats(word.id);
+        const statsText = wordStats ? 
+            `(правильно: ${wordStats.correct}/${wordStats.total}, ${wordStats.accuracy}%)` : 
+            '';
         
         return `
             <div class="word-card ${isFavorite ? 'favorite' : ''}" data-id="${word.id}">
                 <div class="word-header">
-                    <h3 class="word-english">${word.english}</h3>
+                    <div>
+                        <h3 class="word-english">${word.english}</h3>
+                        ${statsText ? `<div class="word-stats-badge">${statsText}</div>` : ''}
+                    </div>
                     <button class="fav-btn ${isFavorite ? 'favorited' : ''}" data-id="${word.id}">
                         <i class="${isFavorite ? 'fas' : 'far'} fa-star"></i>
                     </button>
@@ -310,8 +331,24 @@ document.addEventListener('DOMContentLoaded', function() {
             // Перерендер
             if (tab === 'favorites') {
                 renderFavorites();
-            } else {
+            } else if (tab === 'dictionary') {
                 renderChapters(searchInput.value);
+            } else if (tab === 'test') {
+                // При переключении на тест, показываем стартовый экран
+                testContainer.innerHTML = `
+                    <div class="test-start-screen">
+                        <i class="fas fa-brain" style="font-size: 4rem; color: #4361ee; margin-bottom: 20px;"></i>
+                        <h2>Проверьте свои знания</h2>
+                        <p>Выберите настройки и начните тест. Вам будут предложены слова или фразы, и нужно выбрать правильный перевод из 4 вариантов.</p>
+                        <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                            <button id="startTestFromScreen" class="btn-test" style="font-size: 1.1rem; padding: 15px 30px;">
+                                <i class="fas fa-play-circle"></i> Начать тест
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('startTestFromScreen').addEventListener('click', startTest);
             }
         });
     });
@@ -465,15 +502,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('[data-tab="favorites"]').click();
         }
     });
-    
-    // Инициализация
-    loadDictionary();
-
-    // Данные для теста
-    let testQuestions = [];
-    let currentQuestionIndex = 0;
-    let testScore = 0;
-    let userAnswers = [];
 
     // Функция для заполнения селектора глав
     function populateChapterSelect() {
@@ -497,20 +525,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Генерация случайных неправильных вариантов ответа
-    function generateWrongOptions(correctWord, count = 3) {
+    // Генерация случайных неправильных вариантов ответа (в нужном языке)
+    function generateWrongOptions(correctWord, count = 3, questionType) {
         const wrongOptions = [];
         const allWords = dictionary.filter(word => word.id !== correctWord.id);
         
-        // Берем случайные слова из словаря
+        // Определяем, какие варианты нужны: английские или русские
+        const isEnglishQuestion = questionType === 'english';
+        
         for (let i = 0; i < count; i++) {
             if (allWords.length > 0) {
                 const randomIndex = Math.floor(Math.random() * allWords.length);
-                wrongOptions.push(allWords[randomIndex].russian);
-                // Удаляем выбранное слово, чтобы избежать повторов
+                // Выбираем вариант на нужном языке
+                const wrongOption = isEnglishQuestion 
+                    ? allWords[randomIndex].russian  // для вопроса на английском нужны русские варианты
+                    : allWords[randomIndex].english; // для вопроса на русском нужны английские варианты
+                wrongOptions.push(wrongOption);
                 allWords.splice(randomIndex, 1);
             } else {
-                // Если слов не хватает, добавляем заглушки
                 wrongOptions.push(`Вариант ${i + 1}`);
             }
         }
@@ -539,7 +571,8 @@ document.addEventListener('DOMContentLoaded', function() {
             correctAnswer = word.english;
         }
         
-        const wrongOptions = generateWrongOptions(word, 3);
+        // Генерация неправильных вариантов В НУЖНОМ ЯЗЫКЕ
+        const wrongOptions = generateWrongOptions(word, 3, questionType);
         const allOptions = [correctAnswer, ...wrongOptions];
         
         // Перемешиваем варианты
@@ -696,11 +729,87 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Сохранение результатов теста
+    function saveTestResults(score, totalQuestions, questions) {
+        const testResult = {
+            date: new Date().toISOString(),
+            score: score,
+            total: totalQuestions,
+            percentage: Math.round((score / totalQuestions) * 100),
+            questions: questions.map((q, index) => ({
+                wordId: q.word.id,
+                wordEnglish: q.word.english,
+                wordRussian: q.word.russian,
+                wasCorrect: userAnswers[index]?.isCorrect || false,
+                questionType: q.type
+            })),
+            // Сохраняем использованные настройки
+            settings: {
+                includeExamples: includeExamplesCheckbox.checked,
+                onlyFavorites: onlyFavoritesCheckbox.checked,
+                chapter: chapterSelect.value,
+                questionsCount: questionsCountInput.value
+            }
+        };
+        
+        testHistory.unshift(testResult); // Добавляем в начало
+        if (testHistory.length > 20) testHistory = testHistory.slice(0, 20); // Ограничиваем историю
+        
+        localStorage.setItem('testHistory', JSON.stringify(testHistory));
+        
+        // Обновляем статистику для слов
+        updateWordStatistics(testResult.questions);
+    }
+
+    // Обновление статистики для слов
+    function updateWordStatistics(questionResults) {
+        let wordStats = JSON.parse(localStorage.getItem('wordStats') || '{}');
+        
+        questionResults.forEach(result => {
+            const wordId = result.wordId.toString();
+            
+            if (!wordStats[wordId]) {
+                wordStats[wordId] = {
+                    correct: 0,
+                    total: 0,
+                    lastSeen: new Date().toISOString()
+                };
+            }
+            
+            wordStats[wordId].total += 1;
+            if (result.wasCorrect) {
+                wordStats[wordId].correct += 1;
+            }
+            wordStats[wordId].lastSeen = new Date().toISOString();
+            wordStats[wordId].accuracy = Math.round((wordStats[wordId].correct / wordStats[wordId].total) * 100);
+        });
+        
+        localStorage.setItem('wordStats', JSON.stringify(wordStats));
+    }
+
+    // Получение статистики для слова
+    function getWordStats(wordId) {
+        const wordStats = JSON.parse(localStorage.getItem('wordStats') || '{}');
+        return wordStats[wordId.toString()] || null;
+    }
+
+    // Отметить слово как изученное
+    function markWordAsLearned(wordId) {
+        let learnedWords = JSON.parse(localStorage.getItem('learnedWords') || '[]');
+        if (!learnedWords.includes(wordId)) {
+            learnedWords.push(wordId);
+            localStorage.setItem('learnedWords', JSON.stringify(learnedWords));
+        }
+    }
+
     // Показать результаты
     function showResults() {
         const percentage = Math.round((testScore / testQuestions.length) * 100);
-        let message = '';
         
+        // Сохраняем результаты теста
+        saveTestResults(testScore, testQuestions.length, testQuestions);
+        
+        let message = '';
         if (percentage >= 90) message = 'Отлично! Вы знаете эти слова на отлично! 🎉';
         else if (percentage >= 70) message = 'Хорошо! Но есть что повторить 👍';
         else if (percentage >= 50) message = 'Неплохо, но нужно больше практики 💪';
@@ -724,6 +833,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div>
                         <strong>Точность:</strong> ${percentage}%
                     </div>
+                    <div>
+                        <strong>Всего тестов:</strong> ${testHistory.length}
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center;">
+                    <button id="viewHistory" class="btn-secondary" style="padding: 10px 15px;">
+                        <i class="fas fa-history"></i> История тестов
+                    </button>
+                    <button id="viewStats" class="btn-secondary" style="padding: 10px 15px;">
+                        <i class="fas fa-chart-bar"></i> Статистика
+                    </button>
                 </div>
                 
                 <h3 style="margin-top: 30px; margin-bottom: 15px;">Разбор ответов:</h3>
@@ -731,16 +852,35 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${testQuestions.map((q, index) => {
                         const answer = userAnswers[index];
                         const isCorrect = answer?.isCorrect;
+                        const wordStats = getWordStats(q.word.id);
+                        const statsText = wordStats ? 
+                            `(правильно: ${wordStats.correct}/${wordStats.total}, ${wordStats.accuracy}%)` : 
+                            '(первый раз)';
                         
                         return `
                             <div class="result-item ${isCorrect ? 'correct' : 'incorrect'}">
-                                <strong>${index + 1}. ${q.question}</strong>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <strong>${index + 1}. ${q.question}</strong>
+                                    <span class="word-stats-badge">${statsText}</span>
+                                </div>
                                 <div>Ваш ответ: ${q.options[answer?.selected] || 'Нет ответа'}</div>
                                 <div>Правильный ответ: ${q.correctAnswer}</div>
-                                ${q.type === 'english' ? 
-                                    `<div class="answer-review">Слово: ${q.word.english} → ${q.word.russian}</div>` :
-                                    `<div class="answer-review">Перевод: ${q.word.russian} → ${q.word.english}</div>`
-                                }
+                                <div class="answer-review">
+                                    ${q.type === 'english' ? 
+                                        `Слово: ${q.word.english} → ${q.word.russian}` :
+                                        `Перевод: ${q.word.russian} → ${q.word.english}`
+                                    }
+                                </div>
+                                <div class="word-actions" style="margin-top: 10px; display: flex; gap: 10px;">
+                                    ${!isCorrect ? `
+                                        <button class="mark-learned-btn" data-word-id="${q.word.id}" style="padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                            <i class="fas fa-check"></i> Запомнил
+                                        </button>
+                                    ` : ''}
+                                    <button class="add-to-fav-btn" data-word-id="${q.word.id}" style="padding: 5px 10px; background: #ffd700; color: #856404; border: none; border-radius: 4px; cursor: pointer;">
+                                        ${favorites.includes(q.word.id) ? '<i class="fas fa-star"></i> В избранном' : '<i class="far fa-star"></i> В избранное'}
+                                    </button>
+                                </div>
                             </div>
                         `;
                     }).join('')}
@@ -757,11 +897,299 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
+        // Добавляем обработчики для кнопок в карточках слов
+        document.querySelectorAll('.mark-learned-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const wordId = parseInt(this.dataset.wordId);
+                markWordAsLearned(wordId);
+                this.innerHTML = '<i class="fas fa-check"></i> Запомнено!';
+                this.style.background = '#6c757d';
+                this.disabled = true;
+            });
+        });
+        
+        document.querySelectorAll('.add-to-fav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const wordId = parseInt(this.dataset.wordId);
+                toggleFavorite(wordId);
+                this.innerHTML = favorites.includes(wordId) ? 
+                    '<i class="fas fa-star"></i> В избранном' : 
+                    '<i class="far fa-star"></i> В избранное';
+            });
+        });
+        
+        // Обработчики кнопок истории и статистики
+        document.getElementById('viewHistory').addEventListener('click', showTestHistory);
+        document.getElementById('viewStats').addEventListener('click', showTestStatistics);
+        
         // Обработчики кнопок в результатах
         document.getElementById('restartTest').addEventListener('click', startTest);
         document.getElementById('backToDictionary').addEventListener('click', () => {
             document.querySelector('[data-tab="dictionary"]').click();
         });
+    }
+
+    // Показать историю тестов
+    function showTestHistory() {
+        testContainer.innerHTML = `
+            <div class="test-history active">
+                <h2><i class="fas fa-history"></i> История тестов</h2>
+                ${testHistory.length === 0 ? `
+                    <div class="empty-message" style="margin: 30px 0;">
+                        <i class="fas fa-clock" style="font-size: 3rem; margin-bottom: 20px; color: #6c757d;"></i>
+                        <h3>История тестов пуста</h3>
+                        <p>Пройдите тест, чтобы увидеть здесь статистику</p>
+                    </div>
+                ` : `
+                    <div class="history-list">
+                        ${testHistory.map((test, index) => `
+                            <div class="history-item ${test.percentage >= 70 ? 'good' : test.percentage >= 50 ? 'average' : 'bad'}">
+                                <div class="history-header">
+                                    <div class="history-date">${new Date(test.date).toLocaleDateString('ru-RU', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}</div>
+                                    <div class="history-score">${test.percentage}%</div>
+                                </div>
+                                <div class="history-details">
+                                    <div>Правильно: ${test.score}/${test.total}</div>
+                                    <div>${test.settings.onlyFavorites ? 'Только избранное' : 'Все слова'}</div>
+                                    <div>${test.settings.chapter ? `Глава ${test.settings.chapter}` : 'Все главы'}</div>
+                                </div>
+                                <button class="view-test-details" data-index="${index}" style="margin-top: 10px; padding: 5px 10px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-eye"></i> Подробнее
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
+                <div style="margin-top: 30px; text-align: center;">
+                    <button id="backToResults" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Назад к результатам
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Обработчики для кнопок просмотра деталей
+        document.querySelectorAll('.view-test-details').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.dataset.index);
+                showTestDetails(index);
+            });
+        });
+        
+        document.getElementById('backToResults').addEventListener('click', showResults);
+    }
+
+    // Показать детали конкретного теста
+    function showTestDetails(index) {
+        const test = testHistory[index];
+        
+        testContainer.innerHTML = `
+            <div class="test-details active">
+                <h2><i class="fas fa-search"></i> Детали теста</h2>
+                <div class="test-info">
+                    <div><strong>Дата:</strong> ${new Date(test.date).toLocaleString('ru-RU')}</div>
+                    <div><strong>Результат:</strong> ${test.score}/${test.total} (${test.percentage}%)</div>
+                    <div><strong>Настройки:</strong> ${test.settings.onlyFavorites ? 'Только избранное' : 'Все слова'}, 
+                    ${test.settings.chapter ? `Глава ${test.settings.chapter}` : 'Все главы'}</div>
+                </div>
+                
+                <h3 style="margin-top: 30px;">Вопросы:</h3>
+                <div class="questions-list">
+                    ${test.questions.map((q, qIndex) => `
+                        <div class="question-item ${q.wasCorrect ? 'correct' : 'incorrect'}">
+                            <div><strong>${qIndex + 1}. ${q.questionType === 'english' ? q.wordEnglish : q.wordRussian}</strong></div>
+                            <div>${q.wasCorrect ? '✅ Правильно' : '❌ Ошибка'}</div>
+                            <div class="question-words">${q.wordEnglish} — ${q.wordRussian}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center;">
+                    <button id="backToHistory" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Назад к истории
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('backToHistory').addEventListener('click', showTestHistory);
+    }
+
+    // Показать общую статистику
+    function showTestStatistics() {
+        const totalTests = testHistory.length;
+        const totalQuestions = testHistory.reduce((sum, test) => sum + test.total, 0);
+        const totalCorrect = testHistory.reduce((sum, test) => sum + test.score, 0);
+        const avgPercentage = totalTests > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0;
+        
+        // Считаем лучший результат
+        const bestTest = testHistory.length > 0 ? 
+            testHistory.reduce((best, test) => test.percentage > best.percentage ? test : best) : 
+            null;
+        
+        testContainer.innerHTML = `
+            <div class="test-statistics active">
+                <h2><i class="fas fa-chart-bar"></i> Статистика обучения</h2>
+                
+                ${totalTests === 0 ? `
+                    <div class="empty-message" style="margin: 30px 0;">
+                        <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 20px; color: #6c757d;"></i>
+                        <h3>Нет данных</h3>
+                        <p>Пройдите несколько тестов, чтобы увидеть статистику</p>
+                    </div>
+                ` : `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${totalTests}</div>
+                            <div class="stat-label">Всего тестов</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${totalQuestions}</div>
+                            <div class="stat-label">Всего вопросов</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${avgPercentage}%</div>
+                            <div class="stat-label">Средняя точность</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${bestTest ? bestTest.percentage + '%' : '—'}</div>
+                            <div class="stat-label">Лучший результат</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <h3>Прогресс по дням</h3>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: var(--border-radius);">
+                            <canvas id="progressChart" height="150"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <button id="clearHistory" class="btn-secondary" style="background: #dc3545;">
+                            <i class="fas fa-trash"></i> Очистить историю
+                        </button>
+                    </div>
+                `}
+                
+                <div style="margin-top: 30px; text-align: center;">
+                    <button id="backToResultsFromStats" class="btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Назад к результатам
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        if (totalTests > 0) {
+            // Инициализация графика (упрощенная версия)
+            drawProgressChart();
+            
+            document.getElementById('clearHistory').addEventListener('click', () => {
+                if (confirm('Очистить всю историю тестов? Это действие нельзя отменить.')) {
+                    testHistory = [];
+                    localStorage.removeItem('testHistory');
+                    localStorage.removeItem('wordStats');
+                    showTestStatistics();
+                }
+            });
+        }
+        
+        document.getElementById('backToResultsFromStats').addEventListener('click', showResults);
+    }
+
+    // Рисуем график прогресса
+    function drawProgressChart() {
+        const canvas = document.getElementById('progressChart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Группируем тесты по дням
+        const dailyData = {};
+        testHistory.forEach(test => {
+            const date = new Date(test.date).toLocaleDateString('ru-RU');
+            if (!dailyData[date]) {
+                dailyData[date] = { total: 0, correct: 0, count: 0 };
+            }
+            dailyData[date].total += test.total;
+            dailyData[date].correct += test.score;
+            dailyData[date].count += 1;
+        });
+        
+        const dates = Object.keys(dailyData).reverse().slice(0, 7); // Последние 7 дней
+        const percentages = dates.map(date => {
+            const data = dailyData[date];
+            return Math.round((data.correct / data.total) * 100);
+        });
+        
+        // Упрощенная отрисовка (без Chart.js)
+        const width = canvas.width;
+        const height = canvas.height;
+        const padding = 40;
+        const chartWidth = width - 2 * padding;
+        const chartHeight = height - 2 * padding;
+        
+        // Очистка
+        ctx.clearRect(0, 0, width, height);
+        
+        // Оси
+        ctx.beginPath();
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, height - padding);
+        ctx.lineTo(width - padding, height - padding);
+        ctx.strokeStyle = '#6c757d';
+        ctx.stroke();
+        
+        // Горизонтальные линии
+        for (let i = 0; i <= 100; i += 25) {
+            const y = padding + chartHeight * (1 - i / 100);
+            ctx.beginPath();
+            ctx.moveTo(padding - 5, y);
+            ctx.lineTo(width - padding, y);
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.stroke();
+            
+            // Подписи
+            ctx.fillStyle = '#6c757d';
+            ctx.font = '12px Arial';
+            ctx.fillText(i + '%', padding - 30, y + 4);
+        }
+        
+        // Данные
+        if (dates.length > 1) {
+            ctx.beginPath();
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#4361ee';
+            ctx.lineWidth = 3;
+            
+            dates.forEach((date, index) => {
+                const x = padding + (chartWidth * index) / (dates.length - 1);
+                const y = padding + chartHeight * (1 - percentages[index] / 100);
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+                
+                // Точки
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#4361ee';
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            ctx.stroke();
+        } else {
+            ctx.fillStyle = '#6c757d';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Недостаточно данных для графика', width / 2, height / 2);
+        }
     }
 
     // Запуск теста
@@ -771,56 +1199,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Инициализация теста при переключении на вкладку
-    tabBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const tab = this.dataset.tab;
-            
-            // При переключении на тест, показываем стартовый экран
-            if (tab === 'test') {
-                testContainer.innerHTML = `
-                    <div class="test-start-screen">
-                        <i class="fas fa-brain" style="font-size: 4rem; color: #4361ee; margin-bottom: 20px;"></i>
-                        <h2>Проверьте свои знания</h2>
-                        <p>Выберите настройки и начните тест. Вам будут предложены слова или фразы, и нужно выбрать правильный перевод из 4 вариантов.</p>
-                        <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
-                            <button id="startTestFromScreen" class="btn-test" style="font-size: 1.1rem; padding: 15px 30px;">
-                                <i class="fas fa-play-circle"></i> Начать тест
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('startTestFromScreen').addEventListener('click', startTest);
-            }
-        });
-    });
-
     // Обработчик кнопки старта теста
     startTestBtn.addEventListener('click', startTest);
 
-    // В функции loadDictionary добавляем вызов заполнения глав
-    async function loadDictionary() {
-        try {
-            const response = await fetch('dictionary.json');
-            if (!response.ok) throw new Error('Ошибка загрузки словаря');
-            
-            const data = await response.json();
-            dictionary = data.words || [];
-            
-            updateStats();
-            renderChapters();
-            updateFavoritesCount();
-            populateChapterSelect(); // Добавляем эту строку
-        } catch (error) {
-            console.error('Ошибка загрузки словаря:', error);
-            chaptersContainer.innerHTML = `
-                <div class="empty-message">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px; color: #ff6b6b;"></i>
-                    <h3>Ошибка загрузки словаря</h3>
-                    <p>Пожалуйста, проверьте файл dictionary.json</p>
-                </div>
-            `;
-        }
-    }
+    // Инициализация
+    loadDictionary();
 });
