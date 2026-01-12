@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentQuestionIndex = 0;
     let testScore = 0;
     let userAnswers = [];
+    let wordFeedbackModal = null;
 
     // История тестов
     let testHistory = JSON.parse(localStorage.getItem('testHistory') || '[]');
@@ -184,28 +185,36 @@ document.addEventListener('DOMContentLoaded', function () {
             '';
 
         return `
-            <div class="word-card ${isFavorite ? 'favorite' : ''}" data-id="${word.id}">
-                <div class="word-header">
-                    <div>
-                        <h3 class="word-english">${word.english}</h3>
-                        ${statsText ? `<div class="word-stats-badge">${statsText}</div>` : ''}
-                    </div>
-                    <button class="fav-btn ${isFavorite ? 'favorited' : ''}" data-id="${word.id}">
+        <div class="word-card ${isFavorite ? 'favorite' : ''}" data-id="${word.id}">
+            <div class="word-header">
+                <div>
+                    <h3 class="word-english">${word.english}</h3>
+                    ${statsText ? `<div class="word-stats-badge">${statsText}</div>` : ''}
+                </div>
+                <div class="word-header-buttons">
+                    <button class="fav-btn ${isFavorite ? 'favorited' : ''}" data-id="${word.id}" title="${isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}">
                         <i class="${isFavorite ? 'fas' : 'far'} fa-star"></i>
                     </button>
+                    <button class="word-feedback-btn" data-word-id="${word.id}" title="Сообщить об ошибке">
+                        <i class="fas fa-bug"></i>
+                    </button>
                 </div>
-                <p class="transcription">${word.transcription || ''}</p>
-                <p class="russian">${word.russian}</p>
-                ${word.examples && word.examples.length > 0 ? `
-                    <div class="examples">
-                        <h4>Примеры:</h4>
-                        <ul>
-                            ${word.examples.map(example => `<li>${example}</li>`).join('')}
-                        </ul>
-                    </div>
-                ` : ''}
             </div>
-        `;
+            <p class="transcription">${word.transcription || ''}</p>
+            <p class="russian">${word.russian}</p>
+            ${word.examples && word.examples.length > 0 ? `
+                <div class="examples">
+                    <h4>Примеры:</h4>
+                    <ul>
+                        ${word.examples.map(example => `<li>${example}</li>`).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            <div class="word-footer">
+                <span class="word-chapter">Глава ${word.chapter}</span>
+            </div>
+        </div>
+    `;
     }
 
     // Рендер избранного
@@ -278,6 +287,230 @@ document.addEventListener('DOMContentLoaded', function () {
                 toggleFavorite(wordId);
             });
         });
+
+        // Добавим обработчики для кнопок фидбека слов
+        document.querySelectorAll('.word-feedback-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const wordId = parseInt(this.dataset.wordId);
+                const word = dictionary.find(w => w.id === wordId);
+                if (word) {
+                    showWordFeedbackModal(word);
+                }
+            });
+        });
+    }
+
+    // Функция для показа модального окна фидбека для конкретного слова
+    function showWordFeedbackModal(word) {
+        // Создаем модальное окно, если еще не создано
+        if (!wordFeedbackModal) {
+            wordFeedbackModal = document.createElement('div');
+            wordFeedbackModal.id = 'wordFeedbackModal';
+            wordFeedbackModal.className = 'modal';
+            wordFeedbackModal.innerHTML = `
+            <div class="modal-content word-feedback-modal">
+                <span class="close-word-feedback-modal">&times;</span>
+                <h2><i class="fas fa-bug"></i> Сообщить об ошибке</h2>
+                <div class="word-info">
+                    <div><strong>Слово:</strong> <span id="feedbackWordEnglish"></span></div>
+                    <div><strong>Перевод:</strong> <span id="feedbackWordRussian"></span></div>
+                    <div><strong>Транскрипция:</strong> <span id="feedbackWordTranscription"></span></div>
+                    <div><strong>Глава:</strong> <span id="feedbackWordChapter"></span></div>
+                </div>
+                <textarea id="wordFeedbackText" placeholder="Опишите ошибку или предложение по улучшению для этого слова..."></textarea>
+                <div class="modal-buttons">
+                    <button id="sendWordFeedback" class="btn-primary">Отправить</button>
+                    <button id="cancelWordFeedback" class="btn-secondary">Отмена</button>
+                </div>
+            </div>
+        `;
+            document.body.appendChild(wordFeedbackModal);
+
+            // Добавляем обработчики закрытия
+            const closeBtn = wordFeedbackModal.querySelector('.close-word-feedback-modal');
+            closeBtn.addEventListener('click', () => {
+                wordFeedbackModal.style.display = 'none';
+            });
+
+            document.getElementById('cancelWordFeedback').addEventListener('click', () => {
+                wordFeedbackModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === wordFeedbackModal) {
+                    wordFeedbackModal.style.display = 'none';
+                }
+            });
+
+            // Обработчик отправки фидбека
+            document.getElementById('sendWordFeedback').addEventListener('click', () => {
+                sendWordFeedback(word);
+            });
+
+            // Горячая клавиша Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && wordFeedbackModal.style.display === 'block') {
+                    wordFeedbackModal.style.display = 'none';
+                }
+            });
+        }
+
+        // Заполняем информацию о слове
+        document.getElementById('feedbackWordEnglish').textContent = word.english;
+        document.getElementById('feedbackWordRussian').textContent = word.russian;
+        document.getElementById('feedbackWordTranscription').textContent = word.transcription || '—';
+        document.getElementById('feedbackWordChapter').textContent = word.chapter;
+        document.getElementById('wordFeedbackText').value = '';
+
+        // Показываем модальное окно
+        wordFeedbackModal.style.display = 'block';
+        document.getElementById('wordFeedbackText').focus();
+    }
+
+    // Функция отправки фидбека для слова
+    function sendWordFeedback(word) {
+        const feedbackText = document.getElementById('wordFeedbackText').value.trim();
+
+        if (!feedbackText) {
+            alert('Пожалуйста, введите сообщение');
+            return;
+        }
+
+        try {
+            // Формируем данные
+            const feedbackData = {
+                wordId: word.id,
+                wordEnglish: word.english,
+                wordRussian: word.russian,
+                wordTranscription: word.transcription || '',
+                wordChapter: word.chapter,
+                feedbackText: feedbackText,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                pageUrl: window.location.href
+            };
+
+            // Формируем текст сообщения
+            const feedbackMessage = `
+СООБЩЕНИЕ ОБ ОШИБКЕ ДЛЯ СЛОВА:
+===============================
+ID слова: ${feedbackData.wordId}
+Английское слово: ${feedbackData.wordEnglish}
+Русский перевод: ${feedbackData.wordRussian}
+Транскрипция: ${feedbackData.wordTranscription}
+Глава: ${feedbackData.wordChapter}
+
+СООБЩЕНИЕ ПОЛЬЗОВАТЕЛЯ:
+======================
+${feedbackData.feedbackText}
+
+ТЕХНИЧЕСКАЯ ИНФОРМАЦИЯ:
+======================
+Время: ${feedbackData.timestamp}
+URL страницы: ${feedbackData.pageUrl}
+User Agent: ${feedbackData.userAgent}
+Избранных слов: ${favorites.length}
+
+===============================
+
+`;
+
+            // Создаем и скачиваем файл
+            const blob = new Blob([feedbackMessage], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `feedback_word_${word.id}_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // Показываем уведомление
+            showNotification('Спасибо! Файл с вашим сообщением скачан.', 'success');
+
+            // Закрываем модальное окно
+            wordFeedbackModal.style.display = 'none';
+
+            // Записываем в историю фидбеков
+            saveFeedbackHistory(feedbackData);
+
+        } catch (error) {
+            console.error('Ошибка при отправке фидбека:', error);
+            showNotification('Произошла ошибка. Попробуйте еще раз.', 'error');
+        }
+    }
+
+    // Функция для сохранения истории фидбеков
+    function saveFeedbackHistory(feedbackData) {
+        let feedbackHistory = JSON.parse(localStorage.getItem('feedbackHistory') || '[]');
+
+        // Ограничиваем историю 50 записями
+        feedbackHistory.unshift({
+            ...feedbackData,
+            id: Date.now()
+        });
+
+        if (feedbackHistory.length > 50) {
+            feedbackHistory = feedbackHistory.slice(0, 50);
+        }
+
+        localStorage.setItem('feedbackHistory', JSON.stringify(feedbackHistory));
+    }
+
+    // Функция показа уведомления
+    function showNotification(message, type = 'info') {
+        // Создаем контейнер для уведомлений, если его нет
+        let notificationContainer = document.getElementById('notificationContainer');
+        if (!notificationContainer) {
+            notificationContainer = document.createElement('div');
+            notificationContainer.id = 'notificationContainer';
+            notificationContainer.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        `;
+            document.body.appendChild(notificationContainer);
+        }
+
+        // Создаем уведомление
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.style.cssText = `
+        padding: 15px 20px;
+        border-radius: 8px;
+        background: ${type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : '#d1ecf1'};
+        color: ${type === 'success' ? '#155724' : type === 'error' ? '#721c24' : '#0c5460'};
+        border: 1px solid ${type === 'success' ? '#c3e6cb' : type === 'error' ? '#f5c6cb' : '#bee5eb'};
+        min-width: 300px;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+        transform: translateX(100%);
+    `;
+
+        notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+            <div>${message}</div>
+        </div>
+    `;
+
+        notificationContainer.appendChild(notification);
+
+        // Удаляем уведомление через 3 секунды
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
     }
 
     // Переключение избранного
@@ -395,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const feedbackText = document.getElementById('feedbackText').value.trim();
 
         if (!feedbackText) {
-            alert('Пожалуйста, введите сообщение');
+            showNotification('Пожалуйста, введите сообщение', 'error');
             return;
         }
 
@@ -405,31 +638,49 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: feedbackText,
                 timestamp: new Date().toISOString(),
                 userAgent: navigator.userAgent,
-                favoritesCount: favorites.length
+                favoritesCount: favorites.length,
+                pageUrl: window.location.href,
+                type: 'general'
             };
 
-            // В реальном проекте здесь был бы AJAX-запрос на сервер
-            // Для GitHub Pages просто показываем сообщение
-            const feedbackMessage = `Текст: ${feedbackData.text}\nВремя: ${feedbackData.timestamp}\n\n---\n\n`;
+            const feedbackMessage = `
+ОБЩИЙ ФИДБЕК:
+============
+Текст: ${feedbackData.text}
+
+ТЕХНИЧЕСКАЯ ИНФОРМАЦИЯ:
+======================
+Время: ${feedbackData.timestamp}
+URL страницы: ${feedbackData.pageUrl}
+User Agent: ${feedbackData.userAgent}
+Избранных слов: ${feedbackData.favoritesCount}
+
+===============================
+
+`;
 
             // Создаем и скачиваем файл
             const blob = new Blob([feedbackMessage], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'feedback.txt';
+            a.download = `feedback_general_${Date.now()}.txt`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            alert('Спасибо за обратную связь! Файл с вашим сообщением скачан.');
+            showNotification('Спасибо за обратную связь! Файл с вашим сообщением скачан.', 'success');
+
             document.getElementById('feedbackText').value = '';
             feedbackModal.style.display = 'none';
 
+            // Сохраняем в историю
+            saveFeedbackHistory(feedbackData);
+
         } catch (error) {
             console.error('Ошибка при отправке фидбека:', error);
-            alert('Произошла ошибка. Попробуйте еще раз.');
+            showNotification('Произошла ошибка. Попробуйте еще раз.', 'error');
         }
     });
 
@@ -1422,4 +1673,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Инициализация
     loadDictionary();
+
+    // Добавим CSS для анимаций уведомлений
+    function addNotificationStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+    `;
+        document.head.appendChild(style);
+    }
+
+    // Вызовем функцию добавления стилей при загрузке
+    addNotificationStyles();
 });
