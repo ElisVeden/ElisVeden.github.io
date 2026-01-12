@@ -19,6 +19,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const chapterSelect = document.getElementById('chapterSelect');
     const questionsCountInput = document.getElementById('questionsCount');
 
+    // Добавить в начало, после других переменных
+    const donationBtn = document.getElementById('donationBtn');
+    const donationModal = document.getElementById('donationModal');
+    const donateLink = document.getElementById('donateLink');
+    const goToDictionaryBtn = document.querySelector('.go-to-dictionary');
+    const goToFavoritesBtn = document.querySelector('.go-to-favorites');
+    const goToTestBtn = document.querySelector('.go-to-test');
+    const testsCountElement = document.getElementById('testsCount');
+
     // Модальные окна
     const feedbackModal = document.getElementById('feedbackModal');
     const shareModal = document.getElementById('shareModal');
@@ -1769,4 +1778,89 @@ User Agent: ${feedbackData.userAgent}
 
     // Вызовем функцию добавления стилей при загрузке
     addNotificationStyles();
+
+    // Добавить в конец DOMContentLoaded, перед закрывающей скобкой
+
+    // Обработчик кнопки благодарности
+    donationBtn.addEventListener('click', () => {
+        donationModal.style.display = 'block';
+    });
+
+    donateLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        donationModal.style.display = 'block';
+    });
+
+    // Обработчик закрытия модального окна благодарности
+    document.getElementById('closeDonation').addEventListener('click', () => {
+        donationModal.style.display = 'none';
+    });
+
+    // Закрытие модального окна благодарности по клику вне
+    window.addEventListener('click', (e) => {
+        if (e.target === donationModal) {
+            donationModal.style.display = 'none';
+        }
+    });
+
+    // Обработчики быстрого доступа
+    goToDictionaryBtn?.addEventListener('click', () => {
+        document.querySelector('[data-tab="dictionary"]').click();
+    });
+
+    goToFavoritesBtn?.addEventListener('click', () => {
+        document.querySelector('[data-tab="favorites"]').click();
+    });
+
+    goToTestBtn?.addEventListener('click', () => {
+        document.querySelector('[data-tab="test"]').click();
+        showTestStartScreen();
+    });
+
+    // Обновить статистику тестов
+    function updateTestsCount() {
+        testsCountElement.textContent = testHistory.length;
+    }
+
+    // Вызвать в loadDictionary после updateStats
+    updateStats();
+    updateTestsCount();
+
+    // Добавить новую вкладку в обработчик tabBtns
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            const tab = this.dataset.tab;
+
+            // Обновление активной вкладки
+            tabBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            document.getElementById(`${tab}Tab`).classList.add('active');
+
+            currentTab = tab;
+
+            // Перерендер в зависимости от вкладки
+            if (tab === 'home') {
+                // Ничего не рендерим, главная статична
+            } else if (tab === 'favorites') {
+                renderFavorites();
+            } else if (tab === 'dictionary') {
+                renderChapters(searchInput.value);
+            } else if (tab === 'test') {
+                showTestStartScreen();
+            }
+        });
+    });
+
+    // Обновить функцию showNotification в feedback
+    document.getElementById('sendFeedback').addEventListener('click', async function () {
+        // ... существующий код ...
+        // Изменить сообщение на более общее
+        showNotification('Спасибо за обратную связь! Ваше мнение очень важно для нас.', 'success');
+        // ... остальной код ...
+    });
 });
