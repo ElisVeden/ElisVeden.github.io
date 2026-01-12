@@ -24,24 +24,6 @@
             </p>
         </header>
 
-        <!-- Панель управления -->
-        <div class="control-panel">
-            <div class="button-group">
-                <button id="toggleFavorites" class="btn-fav">
-                    <i class="far fa-star"></i> Избранное (<span id="favCount">0</span>)
-                </button>
-                <button id="feedbackBtn" class="btn-feedback">
-                    <i class="fas fa-comment-alt"></i> Обратная связь
-                </button>
-                <button id="shareBtn" class="btn-share">
-                    <i class="fas fa-share-alt"></i> Поделиться
-                </button>
-                <button id="donationBtn" class="btn-feedback" style="background-color: #f8d7da; color: #721c24;">
-                    <i class="fas fa-heart"></i> Поблагодарить автора
-                </button>
-            </div>
-        </div>
-
         <!-- Вкладки -->
         <div class="tabs">
             <button class="tab-btn active" data-tab="home">
@@ -60,6 +42,16 @@
 
         <!-- Главная страница -->
         <div id="homeTab" class="tab-content active home-content">
+            <!-- Кнопки действий на главной -->
+            <div class="home-action-buttons">
+                <button id="feedbackBtn" class="btn-feedback">
+                    <i class="fas fa-comment-alt"></i> Обратная связь
+                </button>
+                <button id="donationBtn" class="btn-donation">
+                    <i class="fas fa-heart"></i> Поблагодарить автора
+                </button>
+            </div>
+
             <!-- Баннер о канале -->
             <div class="banner">
                 <div class="banner-content">
@@ -194,31 +186,6 @@
             <div class="modal-buttons">
                 <button id="sendFeedback" class="btn-primary">Отправить</button>
                 <button id="cancelFeedback" class="btn-secondary">Отмена</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно для шаринга -->
-    <div id="shareModal" class="modal">
-        <div class="modal-content share-modal">
-            <span class="close-modal">&times;</span>
-            <h2><i class="fas fa-share-alt"></i> Поделиться словарем</h2>
-            <div class="share-buttons">
-                <button class="share-option" data-platform="telegram">
-                    <i class="fab fa-telegram"></i> Telegram
-                </button>
-                <button class="share-option" data-platform="whatsapp">
-                    <i class="fab fa-whatsapp"></i> WhatsApp
-                </button>
-                <button class="share-option" data-platform="vk">
-                    <i class="fab fa-vk"></i> ВКонтакте
-                </button>
-                <button class="share-option" data-platform="email">
-                    <i class="fas fa-envelope"></i> Email
-                </button>
-                <button class="share-option" data-platform="copy">
-                    <i class="fas fa-link"></i> Копировать ссылку
-                </button>
             </div>
         </div>
     </div>
