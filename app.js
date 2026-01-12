@@ -765,7 +765,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Обновление статистики для слов
     function updateWordStatistics(questionResults) {
-        let wordStats = JSON.parse(localStorage.getItem('wordStats') || '{}');
+        wordStats = JSON.parse(localStorage.getItem('wordStats') || '{}');
 
         questionResults.forEach(result => {
             const wordId = result.wordId.toString();
@@ -791,7 +791,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Получение статистики для слова
     function getWordStats(wordId) {
-        const wordStats = JSON.parse(localStorage.getItem('wordStats') || '{}');
         return wordStats[wordId.toString()] || null;
     }
 
