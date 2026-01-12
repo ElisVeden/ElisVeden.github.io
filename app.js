@@ -41,6 +41,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentTestResults = []; // Для отслеживания результатов по словам в текущем тесте
     let wordStats = JSON.parse(localStorage.getItem('wordStats') || '{}');
 
+    // TELEGRAM
+    const TELEGRAM_BOT_TOKEN = '8454578430:AAF4j7DCIeZFnzVKcSHqFXSnfz6APaHrpKo'; // Твой токен бота
+    const TELEGRAM_CHAT_ID = '640508615'; // Твой ID или ID чата
 
     // Загрузка данных
     async function loadDictionary() {
@@ -369,76 +372,61 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Функция отправки фидбека для слова
-    function sendWordFeedback(word) {
+    async function sendWordFeedback(word) {
         const feedbackText = document.getElementById('wordFeedbackText').value.trim();
 
         if (!feedbackText) {
-            alert('Пожалуйста, введите сообщение');
+            showNotification('Пожалуйста, введите сообщение', 'error');
             return;
         }
 
         try {
-            // Формируем данные
-            const feedbackData = {
-                wordId: word.id,
-                wordEnglish: word.english,
-                wordRussian: word.russian,
-                wordTranscription: word.transcription || '',
-                wordChapter: word.chapter,
-                feedbackText: feedbackText,
-                timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent,
-                pageUrl: window.location.href
-            };
+            // Формируем сообщение для Telegram
+            const message = `
+<b>📝 Новый фидбек для слова</b>
 
-            // Формируем текст сообщения
-            const feedbackMessage = `
-СООБЩЕНИЕ ОБ ОШИБКЕ ДЛЯ СЛОВА:
-===============================
-ID слова: ${feedbackData.wordId}
-Английское слово: ${feedbackData.wordEnglish}
-Русский перевод: ${feedbackData.wordRussian}
-Транскрипция: ${feedbackData.wordTranscription}
-Глава: ${feedbackData.wordChapter}
+<b>Слово:</b> ${word.english}
+<b>Перевод:</b> ${word.russian}
+<b>Транскрипция:</b> ${word.transcription || '—'}
+<b>Глава:</b> ${word.chapter}
+<b>ID слова:</b> ${word.id}
 
-СООБЩЕНИЕ ПОЛЬЗОВАТЕЛЯ:
-======================
-${feedbackData.feedbackText}
+<b>Сообщение пользователя:</b>
+${feedbackText}
 
-ТЕХНИЧЕСКАЯ ИНФОРМАЦИЯ:
-======================
-Время: ${feedbackData.timestamp}
-URL страницы: ${feedbackData.pageUrl}
-User Agent: ${feedbackData.userAgent}
-Избранных слов: ${favorites.length}
+<b>Время:</b> ${new Date().toLocaleString('ru-RU')}
+<b>Избранных слов у пользователя:</b> ${favorites.length}
+        `;
 
-===============================
+            // Отправляем в Telegram
+            const response = await sendToTelegram(message);
 
-`;
+            if (response.ok) {
+                showNotification('Спасибо! Сообщение отправлено разработчику.', 'success');
 
-            // Создаем и скачиваем файл
-            const blob = new Blob([feedbackMessage], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `feedback_word_${word.id}_${Date.now()}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+                // Сохраняем локально для истории
+                saveFeedbackHistory({
+                    wordId: word.id,
+                    wordEnglish: word.english,
+                    wordRussian: word.russian,
+                    feedbackText: feedbackText,
+                    timestamp: new Date().toISOString(),
+                    sentToTelegram: true
+                });
 
-            // Показываем уведомление
-            showNotification('Спасибо! Файл с вашим сообщением скачан.', 'success');
+            } else {
+                throw new Error('Ошибка отправки в Telegram');
+            }
 
             // Закрываем модальное окно
             wordFeedbackModal.style.display = 'none';
 
-            // Записываем в историю фидбеков
-            saveFeedbackHistory(feedbackData);
-
         } catch (error) {
             console.error('Ошибка при отправке фидбека:', error);
-            showNotification('Произошла ошибка. Попробуйте еще раз.', 'error');
+            showNotification('Не удалось отправить сообщение. Попробуйте позже.', 'error');
+
+            // Показываем fallback - сохранение в localStorage
+            saveFeedbackToLocalStorage(word, feedbackText);
         }
     }
 
@@ -457,6 +445,82 @@ User Agent: ${feedbackData.userAgent}
         }
 
         localStorage.setItem('feedbackHistory', JSON.stringify(feedbackHistory));
+    }
+    // Функция сохранения в localStorage как fallback
+    function saveFeedbackToLocalStorage(word, feedbackText) {
+        const feedbackData = {
+            wordId: word.id,
+            wordEnglish: word.english,
+            wordRussian: word.russian,
+            feedbackText: feedbackText,
+            timestamp: new Date().toISOString(),
+            pending: true // Помечаем как ожидающее отправки
+        };
+
+        let pendingFeedbacks = JSON.parse(localStorage.getItem('pendingFeedbacks') || '[]');
+        pendingFeedbacks.push(feedbackData);
+        localStorage.setItem('pendingFeedbacks', JSON.stringify(pendingFeedbacks));
+
+        showNotification('Сообщение сохранено. Мы отправим его при следующей возможности.', 'info');
+    }
+
+    // Функция для отправки отложенных фидбеков
+    async function sendPendingFeedbacks() {
+        const pendingFeedbacks = JSON.parse(localStorage.getItem('pendingFeedbacks') || '[]');
+
+        if (pendingFeedbacks.length === 0) return;
+
+        for (const feedback of pendingFeedbacks) {
+            try {
+                const message = `
+<b>📝 Отложенный фидбек</b>
+
+<b>Слово:</b> ${feedback.wordEnglish}
+<b>Перевод:</b> ${feedback.wordRussian}
+<b>ID слова:</b> ${feedback.wordId}
+
+<b>Сообщение:</b>
+${feedback.feedbackText}
+
+<b>Время получения:</b> ${new Date(feedback.timestamp).toLocaleString('ru-RU')}
+<b>Отправлено:</b> ${new Date().toLocaleString('ru-RU')}
+            `;
+
+                await sendToTelegram(message);
+
+                // Удаляем из отложенных после успешной отправки
+                pendingFeedbacks.splice(pendingFeedbacks.indexOf(feedback), 1);
+                localStorage.setItem('pendingFeedbacks', JSON.stringify(pendingFeedbacks));
+
+            } catch (error) {
+                console.error('Ошибка отправки отложенного фидбека:', error);
+            }
+        }
+    }
+
+    // Пытаемся отправить отложенные фидбеки при загрузке
+    window.addEventListener('load', () => {
+        setTimeout(sendPendingFeedbacks, 3000); // Ждем 3 секунды после загрузки
+    });
+
+    // Функция отправки в Telegram
+    async function sendToTelegram(message) {
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'HTML',
+                disable_notification: false
+            })
+        });
+
+        return response.json();
     }
 
     // Функция показа уведомления
