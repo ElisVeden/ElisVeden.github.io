@@ -1093,3 +1093,137 @@ header h1 {
     background: #545b62;
     transform: translateY(-2px);
 }
+
+/* Стили для кнопок в заголовке слова */
+.word-header-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.word-feedback-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #dc3545;
+    transition: var(--transition);
+    padding: 5px;
+    border-radius: 4px;
+    opacity: 0.7;
+}
+
+.word-feedback-btn:hover {
+    opacity: 1;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* Модальное окно для фидбека слова */
+.word-feedback-modal {
+    max-width: 500px;
+}
+
+.word-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin: 15px 0;
+    font-size: 0.95rem;
+}
+
+.word-info div {
+    margin-bottom: 8px;
+    display: flex;
+}
+
+.word-info div:last-child {
+    margin-bottom: 0;
+}
+
+.word-info strong {
+    min-width: 100px;
+    color: #6c757d;
+}
+
+.word-footer {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.word-chapter {
+    font-size: 0.85rem;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+/* Уведомления */
+.notification {
+    position: relative;
+    overflow: hidden;
+}
+
+.notification::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: currentColor;
+    opacity: 0.3;
+    animation: progressBar 3s linear;
+}
+
+@keyframes progressBar {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* Адаптивность для кнопок слова */
+@media (max-width: 768px) {
+    .word-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .word-header-buttons {
+        align-self: flex-end;
+        margin-top: -40px;
+    }
+    
+    .word-info div {
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .word-info strong {
+        min-width: auto;
+    }
+}
+
+/* Улучшение карточек слов */
+.word-card {
+    position: relative;
+}
+
+.word-card:hover .word-feedback-btn {
+    opacity: 1;
+}
+
+/* Стили для статистики слова в карточке */
+.word-stats-badge {
+    font-size: 0.75rem;
+    background: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 10px;
+    color: #6c757d;
+    display: inline-block;
+    margin-top: 5px;
+}
