@@ -1610,3 +1610,81 @@ header h1 {
     display: flex;
     gap: 8px;
 }
+
+/* Стили для двухрядных вкладок */
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 25px;
+}
+
+.tab-btn {
+    flex: 1 0 calc(50% - 10px);
+    margin: 5px;
+    padding: 14px 20px;
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+    position: relative;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    min-height: 60px;
+}
+
+.tab-btn:hover {
+    background-color: #f8f9fa;
+    color: var(--primary-color);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    background-color: #f8f9fa;
+    border: 2px solid var(--primary-color);
+}
+
+.tab-btn.active::after {
+    display: none;
+}
+
+.tab-btn i {
+    font-size: 1.2rem;
+    min-width: 24px;
+}
+
+/* Адаптивность для вкладок */
+@media (max-width: 768px) {
+    .tab-btn {
+        flex: 1 0 100%;
+        margin: 2px;
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .tab-btn {
+        flex: 1 0 calc(50% - 10px);
+    }
+}
+
+/* Улучшение для мобильных устройств */
+@media (max-width: 480px) {
+    .tab-btn {
+        font-size: 0.85rem;
+        min-height: 50px;
+        padding: 10px 12px;
+    }
+    
+    .tab-btn i {
+        font-size: 1rem;
+    }
+}
