@@ -1740,3 +1740,46 @@ header h1 {
         margin: 5% auto;
     }
 }
+/* Стили для модального окна фидбека слова */
+.word-feedback-modal .modal-content {
+    max-width: 500px;
+}
+
+.word-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin: 15px 0;
+    font-size: 0.95rem;
+}
+
+.word-info div {
+    margin-bottom: 8px;
+    display: flex;
+}
+
+.word-info div:last-child {
+    margin-bottom: 0;
+}
+
+.word-info strong {
+    min-width: 120px;
+    color: #6c757d;
+}
+
+/* Адаптивность для модальных окон */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+    
+    .word-info div {
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .word-info strong {
+        min-width: auto;
+    }
+}
