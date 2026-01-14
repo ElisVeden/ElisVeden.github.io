@@ -1599,14 +1599,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     <i class="fab fa-telegram"></i>
                     <span>Telegram</span>
                 </button>
-                <button class="share-option" data-platform="whatsapp">
-                    <i class="fab fa-whatsapp"></i>
-                    <span>WhatsApp</span>
-                </button>
-                <button class="share-option" data-platform="email">
-                    <i class="fas fa-envelope"></i>
-                    <span>Email</span>
-                </button>
             </div>
             
             <div class="modal-buttons" style="margin-top: 25px;">
