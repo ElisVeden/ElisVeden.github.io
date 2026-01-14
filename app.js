@@ -872,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         addWordCardHandlers();
-        
+
         // Добавляем обработчики для кнопок в карточках слов
         document.querySelectorAll('.mark-learned-btn').forEach(btn => {
             btn.addEventListener('click', function () {
@@ -1419,4 +1419,268 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
+    // Показать модальное окно для фидбека по слову
+    function showWordFeedbackModal(word) {
+        if (wordFeedbackModal) {
+            wordFeedbackModal.remove();
+        }
+
+        wordFeedbackModal = document.createElement('div');
+        wordFeedbackModal.className = 'modal word-feedback-modal';
+        wordFeedbackModal.style.display = 'block';
+
+        wordFeedbackModal.innerHTML = `
+        <div class="modal-content">
+            <span class="close-word-feedback">&times;</span>
+            <h2><i class="fas fa-bug"></i> Сообщить об ошибке</h2>
+            <p style="margin-bottom: 15px; color: #6c757d;">
+                Укажите ошибку для слова или предложите улучшение
+            </p>
+            
+            <div class="word-info">
+                <div><strong>Слово:</strong> ${word.english}</div>
+                <div><strong>Транскрипция:</strong> ${word.transcription || 'нет'}</div>
+                <div><strong>Перевод:</strong> ${word.russian}</div>
+                <div><strong>Глава:</strong> ${word.chapter}</div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+                    Тип ошибки/предложения:
+                </label>
+                <select id="feedbackType" style="width: 100%; padding: 10px; border-radius: var(--border-radius); border: 2px solid #e0e0e0;">
+                    <option value="translation">Неправильный перевод</option>
+                    <option value="transcription">Ошибка в транскрипции</option>
+                    <option value="example">Ошибка в примере</option>
+                    <option value="spelling">Опечатка/орфография</option>
+                    <option value="suggestion">Предложение по улучшению</option>
+                    <option value="other">Другое</option>
+                </select>
+            </div>
+            
+            <textarea id="wordFeedbackText" placeholder="Опишите ошибку или предложение подробнее..." style="width: 100%; height: 120px; padding: 15px; border: 2px solid #e0e0e0; border-radius: var(--border-radius); font-family: inherit; margin-bottom: 20px;"></textarea>
+            
+            <div class="modal-buttons">
+                <button id="sendWordFeedback" class="btn-primary">Отправить</button>
+                <button id="cancelWordFeedback" class="btn-secondary">Отмена</button>
+            </div>
+        </div>
+    `;
+
+        document.body.appendChild(wordFeedbackModal);
+
+        // Обработчики для модального окна фидбека слова
+        wordFeedbackModal.querySelector('.close-word-feedback').addEventListener('click', () => {
+            wordFeedbackModal.style.display = 'none';
+        });
+
+        wordFeedbackModal.querySelector('#cancelWordFeedback').addEventListener('click', () => {
+            wordFeedbackModal.style.display = 'none';
+        });
+
+        wordFeedbackModal.querySelector('#sendWordFeedback').addEventListener('click', () => {
+            sendWordFeedback(word);
+        });
+
+        // Закрытие при клике вне окна
+        wordFeedbackModal.addEventListener('click', (e) => {
+            if (e.target === wordFeedbackModal) {
+                wordFeedbackModal.style.display = 'none';
+            }
+        });
+    }
+
+    // Отправить фидбек по слову
+    function sendWordFeedback(word) {
+        const feedbackType = document.getElementById('feedbackType').value;
+        const feedbackText = document.getElementById('wordFeedbackText').value.trim();
+
+        if (!feedbackText) {
+            alert('Пожалуйста, опишите ошибку или предложение');
+            return;
+        }
+
+        // Формируем сообщение для Telegram
+        const message = `📝 Фидбек по слову\n\n` +
+            `📍 Слово: ${word.english}\n` +
+            `📖 Перевод: ${word.russian}\n` +
+            `🔢 ID: ${word.id}\n` +
+            `📚 Глава: ${word.chapter}\n` +
+            `🏷️ Тип: ${feedbackType}\n` +
+            `📄 Текст: ${feedbackText}\n` +
+            `🕐 ${new Date().toLocaleString('ru-RU')}`;
+
+        // Отправляем в Telegram
+        sendToTelegram(message);
+
+        // Показываем уведомление
+        showNotification('Спасибо! Ваше сообщение отправлено', 'success');
+
+        // Закрываем модальное окно
+        wordFeedbackModal.style.display = 'none';
+    }
+
+    // Поделиться словом
+    function shareWord(word) {
+        // Создаем модальное окно для шаринга
+        const shareModal = document.createElement('div');
+        shareModal.className = 'modal';
+        shareModal.style.display = 'block';
+
+        const shareText = `📚 Изучаю английский с Barklation Stories!\n\n` +
+            `🇺🇸 ${word.english} ${word.transcription || ''}\n` +
+            `🇷🇺 ${word.russian}\n\n` +
+            `📖 Пример: ${word.examples && word.examples.length > 0 ? word.examples[0] : '—'}\n\n` +
+            `🔗 Присоединяйся: https://t.me/barklation_stories`;
+
+        shareModal.innerHTML = `
+        <div class="modal-content share-modal">
+            <span class="close-share-modal">&times;</span>
+            <h2><i class="fas fa-share-alt"></i> Поделиться словом</h2>
+            <p style="margin-bottom: 15px; color: #6c757d;">
+                Поделитесь этим словом с друзьями или сохраните для себя
+            </p>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px;">
+                <strong>${word.english}</strong> ${word.transcription ? `<small>${word.transcription}</small>` : ''}<br>
+                <em>${word.russian}</em>
+            </div>
+            
+            <textarea id="shareText" readonly style="width: 100%; height: 100px; padding: 15px; border: 2px solid #e0e0e0; border-radius: var(--border-radius); font-family: inherit; margin-bottom: 20px; resize: vertical;">${shareText}</textarea>
+            
+            <div class="share-buttons">
+                <button class="share-option" data-platform="copy">
+                    <i class="fas fa-copy"></i>
+                    <span>Скопировать</span>
+                </button>
+                <button class="share-option" data-platform="telegram">
+                    <i class="fab fa-telegram"></i>
+                    <span>Telegram</span>
+                </button>
+                <button class="share-option" data-platform="whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </button>
+                <button class="share-option" data-platform="email">
+                    <i class="fas fa-envelope"></i>
+                    <span>Email</span>
+                </button>
+            </div>
+            
+            <div class="modal-buttons" style="margin-top: 25px;">
+                <button id="closeShareModal" class="btn-secondary">Закрыть</button>
+            </div>
+        </div>
+    `;
+
+        document.body.appendChild(shareModal);
+
+        // Обработчики для шаринга
+        const closeBtn = shareModal.querySelector('.close-share-modal');
+        const closeShareBtn = shareModal.querySelector('#closeShareModal');
+
+        const closeShareModal = () => {
+            shareModal.style.display = 'none';
+            setTimeout(() => shareModal.remove(), 300);
+        };
+
+        closeBtn.addEventListener('click', closeShareModal);
+        closeShareBtn.addEventListener('click', closeShareModal);
+
+        // Закрытие при клике вне окна
+        shareModal.addEventListener('click', (e) => {
+            if (e.target === shareModal) {
+                closeShareModal();
+            }
+        });
+
+        // Обработчики для кнопок шаринга
+        shareModal.querySelectorAll('.share-option').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const platform = this.dataset.platform;
+                const text = document.getElementById('shareText').value;
+
+                switch (platform) {
+                    case 'copy':
+                        navigator.clipboard.writeText(text).then(() => {
+                            showNotification('Текст скопирован в буфер обмена', 'success');
+                        });
+                        break;
+
+                    case 'telegram':
+                        window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`, '_blank');
+                        break;
+
+                    case 'whatsapp':
+                        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                        break;
+
+                    case 'email':
+                        window.open(`mailto:?subject=${encodeURIComponent('Слово из Barklation Stories')}&body=${encodeURIComponent(text)}`);
+                        break;
+                }
+            });
+        });
+    }
+
+    // Функция для показа уведомлений
+    function showNotification(message, type = 'info') {
+        // Удаляем предыдущие уведомления
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => notification.remove());
+
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#d4edda' : '#d1ecf1'};
+        color: ${type === 'success' ? '#155724' : '#0c5460'};
+        padding: 15px 20px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        z-index: 10000;
+        animation: slideInRight 0.3s ease;
+        max-width: 300px;
+        border-left: 4px solid ${type === 'success' ? '#28a745' : '#17a2b8'};
+    `;
+
+        notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+
+        document.body.appendChild(notification);
+
+        // Автоматическое скрытие через 3 секунды
+        setTimeout(() => {
+            notification.style.animation = 'fadeOut 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+
+    // Отправка сообщения в Telegram
+    function sendToTelegram(message) {
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+        const payload = {
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+        };
+
+        // Отправляем асинхронно, не блокируя интерфейс
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        }).catch(error => {
+            console.error('Ошибка отправки в Telegram:', error);
+        });
+    }
 });
