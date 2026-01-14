@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const clearSearchBtn = document.getElementById('clearSearch');
     const toggleFavoritesBtn = document.getElementById('toggleFavorites');
     const feedbackBtn = document.getElementById('feedbackBtn');
-    const favCountElement = document.getElementById('favCount');
     const favCountStat = document.getElementById('favCountStat');
     const totalWordsElement = document.getElementById('totalWords');
     const chapterCountElement = document.getElementById('chapterCount');
@@ -446,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Обновление счетчика избранного
     function updateFavoritesCount() {
         const count = favorites.length;
-        favCountElement.textContent = count;
+        favCountStat.textContent = count;
         if (toggleFavoritesBtn) {
             toggleFavoritesBtn.innerHTML = `
                 <i class="far fa-star"></i> Избранное (${count})
