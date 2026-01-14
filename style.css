@@ -1783,3 +1783,11 @@ header h1 {
         min-width: auto;
     }
 }
+
+
+
+/* Еще вариант: динамическая высота с max-height в зависимости от содержимого */
+.chapter-content.dynamic-scroll {
+    max-height: calc(100vh - 200px); /* Занимает почти всю высоту экрана */
+    min-height: 200px; /* Минимальная высота */
+}
