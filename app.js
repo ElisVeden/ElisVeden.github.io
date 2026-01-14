@@ -234,10 +234,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 ${statsText ? `<div class="word-stats-badge">${statsText}</div>` : ''}
             </div>
             <div class="word-header-buttons">
-                <button class="fav-btn ${isFavorite ? 'favorited' : ''}" data-id="${word.id}" title="${isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}">
+                <button class="fav-btn ${isFavorite ? 'favorited' : ''}" 
+                        data-id="${word.id}" 
+                        title="${isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}">
                     <i class="${isFavorite ? 'fas' : 'far'} fa-star"></i>
                 </button>
-                <button class="word-feedback-btn" data-word-id="${word.id}" title="Сообщить об ошибке">
+                <button class="word-feedback-btn" 
+                        data-word-id="${word.id}" 
+                        title="Сообщить об ошибке">
                     <i class="fas fa-bug"></i>
                 </button>
             </div>
@@ -257,7 +261,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 <span class="word-chapter">Глава ${word.chapter}</span>
             </div>
             <div class="word-footer-buttons">
-                <button class="word-share-btn" data-word-id="${word.id}" title="Поделиться словом">
+                <button class="word-share-btn" 
+                        data-word-id="${word.id}" 
+                        title="Поделиться словом">
                     <i class="fas fa-share-alt"></i>
                 </button>
             </div>
@@ -329,49 +335,81 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Добавление обработчиков для карточек слов
     function addWordCardHandlers() {
-        // Удаляем старые обработчики (опционально, для предотвращения дублирования)
-        document.querySelectorAll('.fav-btn').forEach(btn => {
-            btn.replaceWith(btn.cloneNode(true));
+        // Используем делегирование событий для динамически созданных элементов
+        document.addEventListener('click', function (e) {
+            // Обработка кнопок избранного
+            if (e.target.closest('.fav-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const favBtn = e.target.closest('.fav-btn');
+                const wordId = parseInt(favBtn.dataset.id);
+                toggleFavorite(wordId);
+                return;
+            }
+
+            // Обработка кнопок фидбека слов
+            if (e.target.closest('.word-feedback-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const feedbackBtn = e.target.closest('.word-feedback-btn');
+                const wordId = parseInt(feedbackBtn.dataset.wordId);
+                const word = dictionary.find(w => w.id === wordId);
+                if (word) {
+                    showWordFeedbackModal(word);
+                }
+                return;
+            }
+
+            // Обработка кнопок поделиться
+            if (e.target.closest('.word-share-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const shareBtn = e.target.closest('.word-share-btn');
+                const wordId = parseInt(shareBtn.dataset.wordId);
+                const word = dictionary.find(w => w.id === wordId);
+                if (word) {
+                    shareWord(word);
+                }
+                return;
+            }
+
+            // Обработка кнопок "В избранное" в результатах теста
+            if (e.target.closest('.add-to-fav-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const favBtn = e.target.closest('.add-to-fav-btn');
+                const wordId = parseInt(favBtn.dataset.wordId);
+                toggleFavorite(wordId);
+
+                // Обновляем текст кнопки
+                favBtn.innerHTML = favorites.includes(wordId) ?
+                    '<i class="fas fa-star"></i> В избранном' :
+                    '<i class="far fa-star"></i> В избранное';
+                favBtn.style.background = favorites.includes(wordId) ? '#ffd700' : '#6c757d';
+                favBtn.style.color = favorites.includes(wordId) ? '#856404' : 'white';
+                return;
+            }
+
+            // Обработка кнопок "Запомнил" в результатах теста
+            if (e.target.closest('.mark-learned-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const btn = e.target.closest('.mark-learned-btn');
+                const wordId = parseInt(btn.dataset.wordId);
+                markWordAsLearned(wordId);
+                btn.innerHTML = '<i class="fas fa-check"></i> Запомнено!';
+                btn.style.background = '#6c757d';
+                btn.disabled = true;
+                return;
+            }
         });
 
-        document.querySelectorAll('.word-feedback-btn').forEach(btn => {
-            btn.replaceWith(btn.cloneNode(true));
-        });
-
-        document.querySelectorAll('.word-share-btn').forEach(btn => {
-            btn.replaceWith(btn.cloneNode(true));
-        });
-
-        // Обработчики для кнопок избранного
+        // Также оставляем прямые обработчики для элементов, которые уже существуют
         document.querySelectorAll('.fav-btn').forEach(btn => {
             btn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const wordId = parseInt(this.dataset.id);
                 toggleFavorite(wordId);
-            });
-        });
-
-        // Обработчики для кнопок фидбека слов
-        document.querySelectorAll('.word-feedback-btn').forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const wordId = parseInt(this.dataset.wordId);
-                const word = dictionary.find(w => w.id === wordId);
-                if (word) {
-                    showWordFeedbackModal(word);
-                }
-            });
-        });
-
-        // Обработчики для кнопок поделиться
-        document.querySelectorAll('.word-share-btn').forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const wordId = parseInt(this.dataset.wordId);
-                const word = dictionary.find(w => w.id === wordId);
-                if (word) {
-                    shareWord(word);
-                }
             });
         });
     }
@@ -382,8 +420,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (index === -1) {
             favorites.push(wordId);
+            console.log('Добавлено в избранное:', wordId);
         } else {
             favorites.splice(index, 1);
+            console.log('Удалено из избранного:', wordId);
         }
 
         // Сохранение в localStorage
@@ -392,10 +432,22 @@ document.addEventListener('DOMContentLoaded', function () {
         // Обновление UI
         updateFavoritesCount();
 
-        // Обновление отображения
-        if (currentTab === 'dictionary') {
-            renderChapters(searchInput.value);
-        } else if (currentTab === 'favorites') {
+        // Находим и обновляем все карточки с этим словом
+        const wordCards = document.querySelectorAll(`.word-card[data-id="${wordId}"]`);
+        wordCards.forEach(card => {
+            card.classList.toggle('favorite', favorites.includes(wordId));
+
+            const favBtn = card.querySelector('.fav-btn');
+            if (favBtn) {
+                const isFavorite = favorites.includes(wordId);
+                favBtn.classList.toggle('favorited', isFavorite);
+                favBtn.innerHTML = `<i class="${isFavorite ? 'fas' : 'far'} fa-star"></i>`;
+                favBtn.title = isFavorite ? 'Убрать из избранного' : 'Добавить в избранное';
+            }
+        });
+
+        // Обновление отображения, если находимся на вкладке избранного
+        if (currentTab === 'favorites') {
             renderFavorites();
         }
     }
