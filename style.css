@@ -1688,3 +1688,55 @@ header h1 {
         font-size: 1rem;
     }
 }
+/* Стили для прокрутки модальных окон */
+.modal-content {
+    max-height: 80vh;
+    overflow-y: auto;
+    margin: 10% auto;
+}
+
+/* Кастомизация скроллбара для модальных окон */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Для Firefox */
+.modal-content {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Стили для ссылок в модальном окне пожертвований */
+#donationModal a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: var(--transition);
+    word-break: break-all;
+}
+
+#donationModal a:hover {
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+/* Адаптивность для модальных окон */
+@media (max-height: 600px) {
+    .modal-content {
+        max-height: 90vh;
+        margin: 5% auto;
+    }
+}
