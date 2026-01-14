@@ -403,15 +403,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
         });
-
-        // Также оставляем прямые обработчики для элементов, которые уже существуют
-        document.querySelectorAll('.fav-btn').forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const wordId = parseInt(this.dataset.id);
-                toggleFavorite(wordId);
-            });
-        });
     }
 
     // Переключение избранного
@@ -1608,6 +1599,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 <button class="share-option" data-platform="telegram">
                     <i class="fab fa-telegram"></i>
                     <span>Telegram</span>
+                </button>
+                <button class="share-option" data-platform="whatsapp">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>WhatsApp</span>
+                </button>
+                <button class="share-option" data-platform="email">
+                    <i class="fas fa-envelope"></i>
+                    <span>Email</span>
                 </button>
             </div>
             
