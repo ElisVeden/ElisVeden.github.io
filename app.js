@@ -329,6 +329,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Добавление обработчиков для карточек слов
     function addWordCardHandlers() {
+        // Удаляем старые обработчики (опционально, для предотвращения дублирования)
+        document.querySelectorAll('.fav-btn').forEach(btn => {
+            btn.replaceWith(btn.cloneNode(true));
+        });
+
+        document.querySelectorAll('.word-feedback-btn').forEach(btn => {
+            btn.replaceWith(btn.cloneNode(true));
+        });
+
+        document.querySelectorAll('.word-share-btn').forEach(btn => {
+            btn.replaceWith(btn.cloneNode(true));
+        });
+
         // Обработчики для кнопок избранного
         document.querySelectorAll('.fav-btn').forEach(btn => {
             btn.addEventListener('click', function (e) {
@@ -858,6 +871,8 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         `;
 
+        addWordCardHandlers();
+        
         // Добавляем обработчики для кнопок в карточках слов
         document.querySelectorAll('.mark-learned-btn').forEach(btn => {
             btn.addEventListener('click', function () {
