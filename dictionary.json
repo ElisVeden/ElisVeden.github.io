@@ -2,51 +2,443 @@
   "words": [
     {
       "id": 1,
-      "english": "gut feeling",
-      "transcription": "[ɡʌt ˈfiːlɪŋ]",
-      "russian": "интуиция, внутреннее чутьё",
-      "examples": ["Его gut feeling подсказывало идти в лес.", "Trust your gut feeling on this decision."],
+      "english": "Outskirts",
+      "transcription": "[ˈaʊtskɜːrts]",
+      "russian": "окраина, окрестности",
+      "examples": [
+        "We live on the outskirts of the city.",
+        "Они гуляли по outskirts их городка."
+      ],
       "chapter": "1.1"
     },
     {
       "id": 2,
-      "english": "blend in",
-      "transcription": "[blend ɪn]",
-      "russian": "сливаться, не выделяться",
-      "examples": ["Он пытался blend in с толпой.", "The animal's coloring helps it blend in with its surroundings."],
+      "english": "Daily routine",
+      "transcription": "[ˈdeɪli ruːˈtiːn]",
+      "russian": "ежедневная рутина, распорядок дня",
+      "examples": [
+        "Exercising has become part of my daily routine.",
+        "Чтобы отвлечься от daily routine."
+      ],
       "chapter": "1.1"
     },
     {
       "id": 3,
-      "english": "break the ice",
-      "transcription": "[breɪk ðə aɪs]",
-      "russian": "растопить лёд, начать общение",
-      "examples": ["Он рассказал шутку, чтобы break the ice.", "Playing a game helped break the ice at the party."],
-      "chapter": "1.2"
+      "english": "Shooting star",
+      "transcription": "[ˈʃuːtɪŋ stɑːr]",
+      "russian": "падающая звезда",
+      "examples": [
+        "Make a wish on a shooting star.",
+        "В небе прочертила хвост a shooting star."
+      ],
+      "chapter": "1.1"
     },
     {
       "id": 4,
-      "english": "hit the books",
-      "transcription": "[hɪt ðə bʊks]",
-      "russian": "усердно учиться, заниматься",
-      "examples": ["Мне нужно hit the books перед экзаменом.", "She's hitting the books for her final exams."],
-      "chapter": "1.2"
+      "english": "Winked back",
+      "transcription": "[wɪŋkt bæk]",
+      "russian": "подмигнула в ответ",
+      "examples": [
+        "The lighthouse beacon seemed to wink back at me.",
+        "Вселенная... winked back."
+      ],
+      "chapter": "1.1"
     },
     {
       "id": 5,
-      "english": "piece of cake",
-      "transcription": "[piːs əv keɪk]",
-      "russian": "очень просто, пустяковое дело",
-      "examples": ["Этот тест был piece of cake.", "Fixing the computer was a piece of cake for him."],
-      "chapter": "2.1"
+      "english": "Enlightened",
+      "transcription": "[ɪnˈlaɪtnd]",
+      "russian": "просветлённый, озарённый",
+      "examples": [
+        "I felt enlightened after the philosophical discussion.",
+        "Лекс заснул той ночью чуть более... enlightened."
+      ],
+      "chapter": "1.1"
     },
     {
       "id": 6,
-      "english": "bend over backwards",
-      "transcription": "[bend ˈoʊvər ˈbækwərdz]",
-      "russian": "из кожи вон лезть, очень стараться",
-      "examples": ["Он bent over backwards чтобы помочь ей.", "The teacher bent over backwards to help her students succeed."],
-      "chapter": "2.1"
+      "english": "Sniffed",
+      "transcription": "[snɪft]",
+      "russian": "принюхался, понюхал",
+      "examples": [
+        "The dog sniffed the ground and followed the trail.",
+        "Лекс sniffed the air с важным видом."
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 7,
+      "english": "Wagged",
+      "transcription": "[wæɡd]",
+      "russian": "вилял (о хвосте)",
+      "examples": [
+        "His tail wagged happily when he saw his owner.",
+        "А его хвост wagged от предвкушения."
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 8,
+      "english": "Hot dogs",
+      "transcription": "[hɒt dɒɡz]",
+      "russian": "хот-доги (сосиски в булке)",
+      "examples": [
+        "Let's grill some hot dogs for the party.",
+        "Сегодня hot dogs на гриле."
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 9,
+      "english": "Pricked up",
+      "transcription": "[prɪkt ʌp]",
+      "russian": "насторожились, встали торчком (об ушах)",
+      "examples": [
+        "The rabbit's ears pricked up at the faint sound.",
+        "Его пушистые уши pricked up."
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 10,
+      "english": "Escape",
+      "transcription": "[ɪˈskeɪp]",
+      "russian": "побег, спасение",
+      "examples": [
+        "The prisoner planned his escape for months.",
+        "Нужно escape!"
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 11,
+      "english": "Slipped through",
+      "transcription": "[slɪpt θruː]",
+      "russian": "прокрался, проскользнул",
+      "examples": [
+        "The spy slipped through the security cordon unnoticed.",
+        "Лекс slipped through собачью дверцу."
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 12,
+      "english": "Dashe out",
+      "transcription": "[dæʃt aʊt]",
+      "russian": "помчался, бросился вон",
+      "examples": [
+        "He dashed out of the burning building.",
+        "И dashed out за пределы участка."
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 13,
+      "english": "Confused",
+      "transcription": "[kənˈfjuːzd]",
+      "russian": "смутил, озадачил",
+      "examples": [
+        "Your sudden question confused me.",
+        "Это его немного confused."
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 14,
+      "english": "Busy street",
+      "transcription": "[ˈbɪzi striːt]",
+      "russian": "оживлённая улица",
+      "examples": [
+        "Be careful when crossing the busy street.",
+        "Направо вела busy street."
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 15,
+      "english": "Quiet alley",
+      "transcription": "[ˈkwaɪət ˈæli]",
+      "russian": "тихий переулок",
+      "examples": [
+        "The cafe is hidden in a quiet alley.",
+        "Налево — quiet alley."
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 16,
+      "english": "Calm down",
+      "transcription": "[kɑːm daʊn]",
+      "russian": "успокоиться, взять себя в руки",
+      "examples": [
+        "Please calm down and explain everything.",
+        "Или может calm down и вернуться?"
+      ],
+      "chapter": "1.1"
+    },
+    {
+      "id": 17,
+      "english": "Turned back",
+      "transcription": "[tɜːrnd bæk]",
+      "russian": "вернулся, повернул назад",
+      "examples": [
+        "He turned back to get his keys.",
+        "Он turned back, чтобы взять ключи."
+      ],
+      "chapter": "1.2"
+    },
+    {
+      "id": 18,
+      "english": "Examined",
+      "transcription": "[ɪɡˈzæmɪnd]",
+      "russian": "осмотрел, изучил",
+      "examples": [
+        "The doctor examined the patient.",
+        "Врач examined пациента."
+      ],
+      "chapter": "1.2"
+    },
+    {
+      "id": 19,
+      "english": "What a relief!",
+      "transcription": "[wɒt ə rɪˈliːf]",
+      "russian": "Какое облегчение!",
+      "examples": [
+        "I found my phone. What a relief!",
+        "Я нашла свой телефон. What a relief!"
+      ],
+      "chapter": "1.2"
+    },
+    {
+      "id": 20,
+      "english": "Squeeze under",
+      "transcription": "[skwiːz ˈʌndər]",
+      "russian": "проскользнуть под, протиснуться под",
+      "examples": [
+        "The cat can squeeze under the door.",
+        "Кошка может squeeze under дверь."
+      ],
+      "chapter": "1.2"
+    },
+    {
+      "id": 21,
+      "english": "Curious face",
+      "transcription": "[ˈkjʊəriəs feɪs]",
+      "russian": "любопытное (заинтересованное) лицо",
+      "examples": [
+        "The child looked at me with a curious face.",
+        "Ребёнок посмотрел на меня с curious face."
+      ],
+      "chapter": "1.2"
+    },
+    {
+      "id": 22,
+      "english": "Amazing smell",
+      "transcription": "[əˈmeɪzɪŋ smel]",
+      "russian": "потрясающий (удивительный) запах",
+      "examples": [
+        "There's an amazing smell coming from the kitchen.",
+        "Из кухни доносится amazing smell."
+      ],
+      "chapter": "1.2"
+    },
+    {
+      "id": 23,
+      "english": "Grinned",
+      "transcription": "[ɡrɪnd]",
+      "russian": "ухмыльнулся, широко улыбнулся",
+      "examples": [
+        "He grinned when he saw the gift.",
+        "Он grinned, увидев подарок."
+      ],
+      "chapter": "1.2"
+    },
+    {
+      "id": 24,
+      "english": "It's a piece of cake",
+      "transcription": "[ɪts ə piːs əv keɪk]",
+      "russian": "Это проще простого! (дословно: это кусок пирога)",
+      "examples": [
+        "Don't worry, this test is a piece of cake.",
+        "Не волнуйтесь, этот тест a piece of cake."
+      ],
+      "chapter": "1.2"
+    },
+    {
+      "id": 25,
+      "english": "Confuses",
+      "transcription": "[kənˈfjuːzɪz]",
+      "russian": "смущает, запутывает",
+      "examples": [
+        "His answer only confuses me more.",
+        "Его ответ только ещё больше меня confuses."
+      ],
+      "chapter": "1.2"
+    },
+    {
+      "id": 26,
+      "english": "Shook his head",
+      "transcription": "[ʃʊk hɪz hed]",
+      "russian": "покачал головой (в знак отказа)",
+      "examples": [
+        "He just shook his head and said nothing.",
+        "Он просто shook his head и ничего не сказал."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 27,
+      "english": "Thanks",
+      "transcription": "[θæŋks]",
+      "russian": "спасибо",
+      "examples": [
+        "Thanks for your help!",
+        "Thanks за помощь!"
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 28,
+      "english": "Big fan",
+      "transcription": "[bɪɡ fæn]",
+      "russian": "большой поклонник",
+      "examples": [
+        "I'm not a big fan of horror movies.",
+        "Я не big fan фильмов ужасов."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 29,
+      "english": "A bit too much",
+      "transcription": "[ə bɪt tuː mʌtʃ]",
+      "russian": "немного слишком, чересчур",
+      "examples": [
+        "The noise was a bit too much for me.",
+        "Шум был для меня a bit too much."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 30,
+      "english": "Take a walk",
+      "transcription": "[teɪk ə wɔːk]",
+      "russian": "прогуляться",
+      "examples": [
+        "Let's take a walk in the park.",
+        "Давай take a walk в парке."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 31,
+      "english": "Agreed",
+      "transcription": "[əˈɡriːd]",
+      "russian": "согласился",
+      "examples": [
+        "He agreed to help us.",
+        "Он agreed помочь нам."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 32,
+      "english": "Guide",
+      "transcription": "[ɡaɪd]",
+      "russian": "гид, проводник",
+      "examples": [
+        "He worked as a tour guide.",
+        "Он работал тур guide."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 33,
+      "english": "Hidden gems",
+      "transcription": "[ˈhɪdn dʒemz]",
+      "russian": "скрытые жемчужины (малоизвестные замечательные места)",
+      "examples": [
+        "This cafe is one of the city's hidden gems.",
+        "Это кафе — одна из hidden gems города."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 34,
+      "english": "Nap",
+      "transcription": "[næp]",
+      "russian": "короткий сон, дремота",
+      "examples": [
+        "I took a quick nap after lunch.",
+        "Я вздремнул quick nap после обеда."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 35,
+      "english": "Hustle and bustle",
+      "transcription": "[ˈhʌsl ənd ˈbʌsl]",
+      "russian": "суета, шумная толчея",
+      "examples": [
+        "I love the hustle and bustle of the market.",
+        "Мне нравится hustle and bustle рынка."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 36,
+      "english": "The best medicine",
+      "transcription": "[ðə best ˈmedɪsɪn]",
+      "russian": "лучшее лекарство",
+      "examples": [
+        "Laughter is the best medicine.",
+        "Смех — the best medicine."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 37,
+      "english": "Promise",
+      "transcription": "[ˈprɒmɪs]",
+      "russian": "обещаю",
+      "examples": [
+        "I promise I'll be back.",
+        "Promise, я вернусь."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 38,
+      "english": "Deal!",
+      "transcription": "[diːl]",
+      "russian": "Договорились! Идёт!",
+      "examples": [
+        "— Let's meet at six. — Deal!",
+        "— Встретимся в шесть. — Deal!"
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 39,
+      "english": "Wagging",
+      "transcription": "[ˈwæɡɪŋ]",
+      "russian": "виляя (хвостом)",
+      "examples": [
+        "The dog greeted us, wagging its tail.",
+        "Собака приветствовала нас, wagging хвостом."
+      ],
+      "chapter": "1.3"
+    },
+    {
+      "id": 40,
+      "english": "Juicy",
+      "transcription": "[ˈdʒuːsi]",
+      "russian": "сочный",
+      "examples": [
+        "She took a bite of a juicy peach.",
+        "Она откусила кусочек juicy персика."
+      ],
+      "chapter": "1.3"
     }
   ]
 }
