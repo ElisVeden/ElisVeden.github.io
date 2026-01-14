@@ -247,8 +247,8 @@ header h1 {
 .chapter-content {
     padding: 0;
     max-height: 2000px;
-    overflow: hidden;
     transition: max-height 0.5s ease;
+    overflow-y: auto; /* Скролл по вертикали */
 }
 
 .chapter.collapsed .chapter-content {
@@ -1782,12 +1782,4 @@ header h1 {
     .word-info strong {
         min-width: auto;
     }
-}
-
-
-
-/* Еще вариант: динамическая высота с max-height в зависимости от содержимого */
-.chapter-content.dynamic-scroll {
-    max-height: calc(100vh - 200px); /* Занимает почти всю высоту экрана */
-    min-height: 200px; /* Минимальная высота */
 }
