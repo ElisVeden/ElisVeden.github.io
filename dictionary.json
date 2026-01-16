@@ -439,6 +439,175 @@
         "Она откусила кусочек juicy персика."
       ],
       "chapter": "1.3"
+    },
+    {
+      "words": [
+        {
+          "id": 41,
+          "english": "The coast was clear",
+          "transcription": "[ðə kəʊst wəz klɪə]",
+          "russian": "(ид.) путь свободен, никого нет",
+          "examples": [
+            "I waited until the coast was clear to sneak in.",
+            "Я подождал, пока the coast was clear, чтобы проскользнуть внутрь."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 42,
+          "english": "Chance",
+          "transcription": "[ʧɑːns]",
+          "russian": "шанс, возможность",
+          "examples": [
+            "This is a great chance to learn.",
+            "Это отличный chance научиться."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 43,
+          "english": "Jumped",
+          "transcription": "[ʤʌmpt]",
+          "russian": "прыгнул, запрыгнул",
+          "examples": [
+            "He jumped over the fence.",
+            "Он jumped через забор."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 44,
+          "english": "Unbearably",
+          "transcription": "[ʌnˈbeərəbli]",
+          "russian": "невыносимо",
+          "examples": [
+            "The weather was unbearably hot.",
+            "Погода была unbearably жаркой."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 45,
+          "english": "Delicious",
+          "transcription": "[dɪˈlɪʃəs]",
+          "russian": "вкусный, восхитительный",
+          "examples": [
+            "The cake was delicious.",
+            "Торт был delicious."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 46,
+          "english": "Steal",
+          "transcription": "[stiːl]",
+          "russian": "воровать",
+          "examples": [
+            "It is wrong to steal.",
+            "Steal — это неправильно."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 47,
+          "english": "Sighed",
+          "transcription": "[saɪd]",
+          "russian": "вздохнул",
+          "examples": [
+            "She sighed with relief.",
+            "Она sighed с облегчением."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 48,
+          "english": "A tough cookie",
+          "transcription": "[ə tʌf ˈkʊki]",
+          "russian": "(ид.) трудная задача, «крепкий орешек»",
+          "examples": [
+            "This math problem is a tough cookie.",
+            "Эта задача по математике — a tough cookie."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 49,
+          "english": "Quiet",
+          "transcription": "[ˈkwaɪət]",
+          "russian": "тихий",
+          "examples": [
+            "Please be quiet.",
+            "Пожалуйста, будьте quiet."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 50,
+          "english": "Reward",
+          "transcription": "[rɪˈwɔːd]",
+          "russian": "награда",
+          "examples": [
+            "Hard work deserves a reward.",
+            "Тяжёлый труд заслуживает reward."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 51,
+          "english": "The cherry on top",
+          "transcription": "[ðə ˈʧeri ɒn tɒp]",
+          "russian": "(ид.) вишенка на торте",
+          "examples": [
+            "Winning was great, and the celebration was the cherry on top.",
+            "Победа была великолепна, а праздник стал the cherry on top."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 52,
+          "english": "Earned",
+          "transcription": "[ɜːnd]",
+          "russian": "заслужил, заработал",
+          "examples": [
+            "He earned everyone's respect.",
+            "Он earned уважение всех."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 53,
+          "english": "Even better",
+          "transcription": "[ˈiːvn ˈbetə]",
+          "russian": "ещё лучше",
+          "examples": [
+            "This option is even better.",
+            "Этот вариант even better."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 54,
+          "english": "Trust",
+          "transcription": "[trʌst]",
+          "russian": "доверие",
+          "examples": [
+            "Our friendship is built on trust.",
+            "Наша дружба построена на trust."
+          ],
+          "chapter": "1.4"
+        },
+        {
+          "id": 55,
+          "english": "Best friend",
+          "transcription": "[best frend]",
+          "russian": "лучший друг",
+          "examples": [
+            "My dog is my best friend.",
+            "Моя собака — мой best friend."
+          ],
+          "chapter": "1.4"
+        }
+      ]
     }
   ]
 }
