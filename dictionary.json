@@ -604,6 +604,116 @@
         "Моя собака — мой best friend."
       ],
       "chapter": "1.4"
+    },
+    {
+      "id": 56,
+      "english": "Awesome",
+      "transcription": "[ˈɔːsəm]",
+      "russian": "потрясающий, классный",
+      "examples": [
+        "That concert was awesome!",
+        "Твой хозяин жарит сосиски. Это awesome!"
+      ],
+      "chapter": "1.5"
+    },
+    {
+      "id": 57,
+      "english": "Together",
+      "transcription": "[təˈɡeðər]",
+      "russian": "вместе",
+      "examples": [
+        "Let's work on this project together.",
+        "Давай лучше together сделаем сосиски?"
+      ],
+      "chapter": "1.5"
+    },
+    {
+      "id": 58,
+      "english": "Deal",
+      "transcription": "[diːl]",
+      "russian": "сделка, договорённость",
+      "examples": [
+        "- I'll help you. - Deal!",
+        "...сделаем сосиски? Deal?"
+      ],
+      "chapter": "1.5"
+    },
+    {
+      "id": 59,
+      "english": "A tough cookie",
+      "transcription": "[ə tʌf ˈkʊki]",
+      "russian": "крепкий орешек (сложная задача)",
+      "examples": [
+        "She's a tough cookie and never gives up.",
+        "Твой кулинарный вкус — a tough cookie для меня."
+      ],
+      "chapter": "1.5"
+    },
+    {
+      "id": 60,
+      "english": "Reward",
+      "transcription": "[rɪˈwɔːrd]",
+      "russian": "награда",
+      "examples": [
+        "A day at the spa was her reward.",
+        "...взяв свою reward в пасть..."
+      ],
+      "chapter": "1.5"
+    },
+    {
+      "id": 61,
+      "english": "Earn",
+      "transcription": "[ɜːrn]",
+      "russian": "заслуживать, зарабатывать",
+      "examples": [
+        "You need to earn their trust.",
+        "Он честно earned право на поиск."
+      ],
+      "chapter": "1.5"
+    },
+    {
+      "id": 62,
+      "english": "Amazing",
+      "transcription": "[əˈmeɪzɪŋ]",
+      "russian": "изумительный, удивительный",
+      "examples": [
+        "The view from the top was amazing.",
+        "Его нос уловил amazing smell у забора."
+      ],
+      "chapter": "1.5"
+    },
+    {
+      "id": 63,
+      "english": "Slip",
+      "transcription": "[slɪp]",
+      "russian": "проскользнуть",
+      "examples": [
+        "He managed to slip out unnoticed.",
+        "Он slipped через собачью дверцу."
+      ],
+      "chapter": "1.5 (повтор)"
+    },
+    {
+      "id": 64,
+      "english": "What a relief!",
+      "transcription": "[wɒt ə rɪˈliːf]",
+      "russian": "Какое облегчение!",
+      "examples": [
+        "The test is over. What a relief!",
+        "What a relief! Настоящая находка."
+      ],
+      "chapter": "1.5 (повтор)"
+    },
+    {
+      "id": 65,
+      "english": "The cherry on top",
+      "transcription": "[ðə ˈtʃeri ɒn tɒp]",
+      "russian": "вишенка на торте",
+      "examples": [
+        "Winning was great, and the party was the cherry on top.",
+        "А гадость с улицы — the cherry on top их дружбы."
+      ],
+      "chapter": "1.5 (повтор)"
     }
   ]
 }
